@@ -1,0 +1,337 @@
+<!doctype html><html><head><meta charset=utf8><meta name="description" content="TRADAL: systematic trading bots, tested to fail and built to last."><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>TRADAL</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: the voyage. Full-width bands that darken with depth; a centred 1180px column inside each band.
+   The page has its own light/dark switch (default light), so its tokens hang off .site[data-mode]. */
+.site{
+  --bg:#ffffff;--ink:#0d2228;--muted:#4f6669;--brand:#044959;--accent:#2b8f87;--card:#ffffff;--soft:#e3f1ef;--alt:#f3f8f7;--line:#d9e2e1;
+  --btn:#044959;--btn-ink:#ffffff;--field:#ffffff;--field-line:#9cbcb9;
+  --b1:#e3f1ef;--b2:#b9dcd8;--b3:#6fb3ad;--b4:#1f7c80;--b5:#044959;--b6:#022c36;
+  --h1:#044959;--h2:#044959;--h3:#04313b;--h4:#ffffff;--h5:#ffffff;--h6:#ffffff;
+  --p1:#35514f;--p2:#24423f;--p3:#062f37;--p4:#e1f3f1;--p5:#d3e8e6;--p6:#c6dddb;
+  --l1:#2b8f87;--l2:#1f6f69;--l3:#04313b;--l4:#d6f0ed;--l5:#9fe0d8;--l6:#9fe0d8;
+  --f-display:Outfit,system-ui,sans-serif;--f-body:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+.site[data-mode="dark"]{
+  --bg:#031c22;--ink:#e3eeed;--muted:#9bb4b3;--brand:#7fd8cf;--accent:#7fd8cf;--card:#0c262c;--soft:#0e4f59;--alt:#06242a;--line:#1d3b41;
+  --btn:#7fd8cf;--btn-ink:#03343f;--field:transparent;--field-line:#2b5a5f;
+  --b1:#0e4f59;--b2:#0b434c;--b3:#08363e;--b4:#062a31;--b5:#041f25;--b6:#02151a;
+  --h1:#7fd8cf;--h2:#7fd8cf;--h3:#e6f4f2;--h4:#ffffff;--h5:#ffffff;--h6:#ffffff;
+  --p1:#c6dddb;--p2:#c6dddb;--p3:#c6dddb;--p4:#c6dddb;--p5:#c6dddb;--p6:#c6dddb;
+  --l1:#9fe0d8;--l2:#9fe0d8;--l3:#9fe0d8;--l4:#9fe0d8;--l5:#9fe0d8;--l6:#9fe0d8;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:#ffffff}
+.site{background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body);min-height:100vh;transition:background .2s,color .2s}
+@media (prefers-reduced-motion:reduce){.site{transition:none}html{scroll-behavior:auto}}
+.in{max-width:1180px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+a{color:var(--brand)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;letter-spacing:-.01em}
+.eyebrow{font:500 12px var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.btn{display:inline-flex;align-items:center;min-height:48px;padding:0 24px;border-radius:999px;font-weight:600;text-decoration:none;border:1.5px solid var(--btn);background:var(--btn);color:var(--btn-ink)}
+.btn.ghost{background:transparent;color:var(--brand);border-color:var(--brand)}
+
+/* nav */
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+nav .in{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding-block:14px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--brand);text-decoration:none;font:700 17px var(--f-display);letter-spacing:.16em}
+.brand svg{width:34px;height:34px}
+.links{margin-left:auto;display:flex;align-items:center;gap:18px;font-size:14px;flex-wrap:wrap}
+.links a{color:var(--ink);text-decoration:none}
+.links a:hover{color:var(--brand)}
+.links .btn{min-height:42px;padding:0 18px;font-size:14px;color:var(--btn-ink)}
+.mode{width:42px;height:42px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
+.mode svg{width:20px;height:20px}
+.mode .moon{display:block}.mode .sun{display:none}
+.site[data-mode="dark"] .mode .moon{display:none}.site[data-mode="dark"] .mode .sun{display:block}
+@media (max-width:760px){.links a:not(.btn){display:none}}
+
+/* hero */
+.hero{text-align:center;padding-block:clamp(48px,8vw,104px)}
+.hero h1{font-size:clamp(38px,6vw,78px);line-height:1.03;margin:18px auto 20px;max-width:18ch;color:var(--brand)}
+.hero p{font-size:19px;color:var(--muted);margin:0 auto 28px;max-width:56ch}
+.cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+
+/* voyage bands */
+.band .in{display:flex;flex-wrap:wrap;gap:12px 48px;align-items:baseline;padding-block:48px}
+.band .lab{flex:0 0 150px;font:500 13px var(--f-mono)}
+.band .txt{flex:1 1 520px;min-width:0}
+.band h2{font-size:clamp(26px,3.2vw,38px);margin:0 0 8px}
+.band p{margin:0;font-size:17px}
+.band.last .in{padding-bottom:64px}
+.k1{background:var(--b1)}.k1 .lab{color:var(--l1)}.k1 h2{color:var(--h1)}.k1 p{color:var(--p1)}
+.k2{background:var(--b2)}.k2 .lab{color:var(--l2)}.k2 h2{color:var(--h2)}.k2 p{color:var(--p2)}
+.k3{background:var(--b3)}.k3 .lab{color:var(--l3)}.k3 h2{color:var(--h3)}.k3 p{color:var(--p3)}
+.k4{background:var(--b4)}.k4 .lab{color:var(--l4)}.k4 h2{color:var(--h4)}.k4 p{color:var(--p4)}
+.k5{background:var(--b5)}.k5 .lab{color:var(--l5)}.k5 h2{color:var(--h5)}.k5 p{color:var(--p5)}
+.k6{background:var(--b6)}.k6 .lab{color:var(--l6)}.k6 h2{color:var(--h6)}.k6 p{color:var(--p6)}
+
+section.pad{padding-block:clamp(56px,8vw,96px)}
+section h2.title{font-size:clamp(28px,3.6vw,44px);margin:0 0 10px;color:var(--brand)}
+.intro{color:var(--muted);font-size:17px;margin:0 0 26px;max-width:none}
+
+/* track record */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:16px}
+.kpi{padding-top:12px;border-top:6px solid var(--b5)}
+.kpi:nth-child(2){border-color:var(--b4)}.kpi:nth-child(3){border-color:var(--b3)}.kpi:nth-child(4){border-color:var(--b2)}
+.site[data-mode="dark"] .kpi{border-color:#7fd8cf}.site[data-mode="dark"] .kpi:nth-child(2){border-color:#5cc4bb}.site[data-mode="dark"] .kpi:nth-child(3){border-color:#3aa8a0}.site[data-mode="dark"] .kpi:nth-child(4){border-color:#9fe0d8}
+.kpi .l{font-size:13px;color:var(--muted)}
+.kpi .v{font:600 30px var(--f-display);color:var(--brand);font-variant-numeric:tabular-nums}
+.chart{height:230px;border-radius:16px;background:var(--soft);display:grid;place-items:center;color:var(--l2);font:500 13px var(--f-mono);text-align:center;padding:16px}
+.site[data-mode="dark"] .chart{color:#9fe0d8}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* never changes */
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.three div{border-top:6px solid var(--brand);padding-top:16px}
+.three h3{margin:0 0 6px;font-size:20px}
+.three p{margin:0;color:var(--muted)}
+@media (max-width:760px){.three{grid-template-columns:1fr}}
+
+/* crew */
+.crew-wrap{background:var(--alt)}
+.crew{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mod{border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.mod .t{font:500 12px var(--f-mono);opacity:.85}
+.mod h3{margin:0;font-size:21px}
+.mod p{margin:0;font-size:15px;opacity:.92}
+.mod .need{margin-top:auto;padding-top:6px;font-size:13px;opacity:.85}
+.mod.k1{color:var(--h1)}.mod.k1 p,.mod.k1 .need{color:var(--p1)}
+.mod.k2{color:var(--h2)}.mod.k2 p,.mod.k2 .need{color:var(--p2)}
+.mod.k3{color:var(--h3)}.mod.k3 p,.mod.k3 .need{color:var(--p3)}
+.mod.k4{color:var(--h4)}.mod.k4 p,.mod.k4 .need{color:var(--p4)}
+.mod.k5{color:var(--h5)}.mod.k5 p,.mod.k5 .need{color:var(--p5)}
+.mod.k6{color:var(--h6)}.mod.k6 p,.mod.k6 .need{color:var(--p6)}
+.boat{grid-column:1/-1;background:var(--card);color:var(--brand);border:1.5px solid var(--brand);border-radius:16px;padding:22px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 32px}
+.boat .t{font:500 12px var(--f-mono)}
+.boat h3{margin:4px 0 0;font-size:24px}
+.boat p{flex:1 1 320px;margin:0;color:var(--muted);font-size:15px}
+.boat .need{font-size:13px;color:var(--muted)}
+.bundles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.bundle{border:1.5px solid var(--brand);border-radius:14px;padding:16px}
+.bundle b{font-family:var(--f-display);color:var(--brand);display:block}
+.bundle span{color:var(--muted);font-size:14px}
+.bundle.full{background:var(--btn);border-color:var(--btn)}
+.bundle.full b,.bundle.full span{color:var(--btn-ink)}
+@media (max-width:860px){.crew{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.crew,.bundles{grid-template-columns:1fr}}
+
+/* course */
+.course{display:grid;grid-template-columns:1fr 1fr;gap:24px 56px;align-items:start}
+.course ol{margin:0;padding-left:22px;line-height:1.9}
+@media (max-width:760px){.course{grid-template-columns:1fr}}
+
+/* waitlist */
+.wl{background:var(--soft)}
+.wl .in{display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between;padding-block:clamp(40px,6vw,72px)}
+.wl h2{margin:0;font-size:clamp(26px,3.4vw,40px);color:var(--brand)}
+.wl form{display:flex;flex-wrap:wrap;gap:10px;flex:0 1 460px}
+.wl input{flex:1 1 220px;min-height:48px;padding:0 16px;border-radius:999px;border:1px solid var(--field-line);background:var(--field);color:var(--ink);font:inherit}
+.wl button{min-height:48px;padding:0 24px;border-radius:999px;border:0;background:var(--btn);color:var(--btn-ink);font:600 16px var(--f-body);cursor:pointer}
+.wl .note{flex:1 1 100%;margin:0;font-size:14px;color:var(--muted);min-height:1.4em}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+footer .in{padding-block:28px 48px;color:var(--muted);font-size:13px;max-width:none}
+footer p{margin:0;max-width:none}
+.site section p.intro,.site footer p,.site .band p,.site .three p{max-width:none !important;width:auto}
+.bt-head{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between;margin:40px 0 14px}
+.bt-head h3{margin:0;font-size:22px;color:var(--brand)}
+.bt-head span{font:500 12px var(--f-mono);color:var(--muted)}
+.bts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.bt{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.bt .tag{align-self:flex-start;font:500 11px var(--f-mono);letter-spacing:.08em;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:2px 7px}
+.bt h4{margin:0;font:600 19px var(--f-display);color:var(--ink)}
+.bt dl{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin:0;font-size:14px}
+.bt dt{color:var(--muted)}
+.bt dd{margin:0;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
+.bt .ratio{font:700 30px var(--f-display);color:var(--brand);line-height:1}
+.bt .ratio small{font:500 12px var(--f-body);color:var(--muted);margin-left:6px}
+.bt.port{background:var(--btn);border-color:var(--btn)}
+.bt.port h4,.bt.port dd,.bt.port .ratio{color:var(--btn-ink)}
+.bt.port dt,.bt.port .ratio small,.bt.port .foot{color:var(--btn-ink);opacity:.8}
+.bt.port .tag{color:var(--btn-ink);border-color:var(--btn-ink)}
+.bt .foot{font-size:12px;color:var(--muted);margin-top:auto}
+@media (max-width:960px){.bts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.bts{grid-template-columns:1fr}}
+.hero{position:relative;overflow:hidden;isolation:isolate}
+.hero .in{position:relative;z-index:1}
+.wm{position:absolute;z-index:0;right:calc(min(620px,90vw) / -2);top:50%;width:min(620px,90vw);aspect-ratio:1;transform:translateY(-50%);color:var(--brand);opacity:.07;pointer-events:none;animation:drift 18s ease-in-out infinite alternate}
+.wm svg{width:100%;height:100%;display:block}
+.wm-lines{position:absolute;z-index:0;left:0;right:0;top:calc(50% + 2%);height:min(300px,40vw);pointer-events:none;opacity:.07;
+  background:repeating-linear-gradient(to bottom,var(--brand) 0 9%,transparent 9% 21%);
+  -webkit-mask:linear-gradient(to right,transparent,#000 18%,#000 82%,transparent);mask:linear-gradient(to right,transparent,#000 18%,#000 82%,transparent)}
+.site[data-mode="dark"] .wm,.site[data-mode="dark"] .wm-lines{opacity:.09}
+@keyframes drift{from{transform:translateY(-50%) rotate(-2deg)}to{transform:translateY(-52%) rotate(2deg)}}
+.hero-badge{display:block;width:52px;height:52px;margin:0 auto 18px;color:var(--brand)}
+.hero-badge svg{width:100%;height:100%;display:block}
+@media (max-width:720px){.wm{opacity:.05}}
+@media (prefers-reduced-motion:reduce){.wm{animation:none}}
+.crewpic{display:block;width:64px;height:64px;margin-top:10px}
+.mod{position:relative}.modpic{position:absolute;top:12px;right:12px;width:52px;height:52px}
+.mod h3,.mod .t{padding-right:56px}
+.lineup{display:block;width:100%;max-width:760px;height:auto;margin:6px auto 22px}
+@media (max-width:600px){.crewpic{width:52px;height:52px}}
+.boatpic{width:72px;height:72px;flex:0 0 auto}
+</style>
+
+<div class="site" id="site" data-mode="light">
+<nav aria-label="Main">
+  <div class="in">
+    <a class="brand" href="#top" aria-label="TRADAL home"><svg viewBox="170 168 160 164" aria-hidden="true"><path fill="currentColor" d="M327.72,240.31h-11.5H183.78c4.7-32.32,32.61-57.23,66.22-57.23c29.53,0,54.66,19.23,63.51,45.83h11.92c-9.23-32.97-39.54-57.23-75.43-57.23c-39.9,0-72.93,30.01-77.72,68.63c-0.4,3.18-0.6,6.41-0.6,9.68c0,0.57,0,1.14,0.02,1.71h11.4h133.8c-0.07,2.63-0.29,5.21-0.65,7.76h-132.5h-11.5c0.01,0.1,0.03,0.2,0.04,0.3c0.47,3.76,1.2,7.44,2.19,11.01c0.01,0.03,0.01,0.05,0.02,0.08c0.74,2.64,1.6,5.24,2.59,7.76c1.22,3.1,2.64,6.09,4.23,8.99c0.45,0.81,0.9,1.62,1.37,2.41h13.7h107.21c-2.06,2.75-4.32,5.35-6.78,7.75H187.97c0.89,1.16,1.83,2.28,2.78,3.38c1.99,2.31,4.13,4.49,6.38,6.55c0.53,0.49,1.06,0.99,1.6,1.46c3.32,2.87,6.86,5.47,10.62,7.76c6.18,3.77,12.92,6.69,20.05,8.64c6.56,1.79,13.47,2.76,20.59,2.76c7.35,0,14.46-1.02,21.21-2.92c5.2-1.47,10.19-3.45,14.9-5.91c1.54-0.81,3.06-1.66,4.54-2.57c3.75-2.29,7.3-4.88,10.61-7.75c1.68-1.46,3.28-3,4.83-4.59c2.1-2.16,4.09-4.42,5.93-6.8c1.91-2.48,3.68-5.06,5.29-7.76c2.16-3.63,4.04-7.44,5.6-11.4H189.51c-1.19-2.5-2.22-5.1-3.1-7.76H325.5c0.2-0.71,0.37-1.44,0.55-2.16c0.57-2.31,1.03-4.65,1.39-7.04c0.11-0.73,0.22-1.46,0.31-2.2c0.31-2.54,0.49-5.14,0.55-7.76c0.02-0.57,0.02-1.13,0.02-1.71C328.32,246.72,328.12,243.49,327.72,240.31z M250,316.92c-11.28,0-21.91-2.8-31.24-7.75h62.49C271.91,314.12,261.28,316.92,250,316.92z"/></svg>TRADAL</a>
+    <div class="links">
+      <a href="#record">Strategies</a>
+      <a href="#crew">Crew</a>
+      <a href="#learn">Playbook</a>
+      <button class="mode" id="modeBtn" type="button" aria-pressed="false" aria-label="Switch to dark mode" title="Switch light / dark">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a class="btn" href="#waitlist">Stay on the lookout</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wm" aria-hidden="true"><svg viewBox="170 168 160 164"><path fill="currentColor" d="M327.72,240.31h-11.5H183.78c4.7-32.32,32.61-57.23,66.22-57.23c29.53,0,54.66,19.23,63.51,45.83h11.92c-9.23-32.97-39.54-57.23-75.43-57.23c-39.9,0-72.93,30.01-77.72,68.63c-0.4,3.18-0.6,6.41-0.6,9.68c0,0.57,0,1.14,0.02,1.71h11.4h133.8c-0.07,2.63-0.29,5.21-0.65,7.76c0,0,0,0,0,0h-132.5c0,0,0,0,0,0h-11.5c0.01,0.1,0.03,0.2,0.04,0.3c0.47,3.76,1.2,7.44,2.19,11.01c0.01,0.03,0.01,0.05,0.02,0.08c0.74,2.64,1.6,5.24,2.59,7.76c1.22,3.1,2.64,6.09,4.23,8.99c0.45,0.81,0.9,1.62,1.37,2.41h0c0,0,0,0,0,0h13.7c0,0,0,0,0,0h107.21c0,0,0,0,0,0c-2.06,2.75-4.32,5.35-6.78,7.75H187.98c0,0,0,0,0,0h-0.01c0.89,1.16,1.83,2.28,2.78,3.38c1.99,2.31,4.13,4.49,6.38,6.55c0.53,0.49,1.06,0.99,1.6,1.46c3.32,2.87,6.86,5.47,10.62,7.76c0,0,0,0,0,0h0c6.18,3.77,12.92,6.69,20.05,8.64c6.56,1.79,13.47,2.76,20.59,2.76c7.35,0,14.46-1.02,21.21-2.92c5.2-1.47,10.19-3.45,14.9-5.91c1.54-0.81,3.06-1.66,4.54-2.57c3.75-2.29,7.3-4.88,10.61-7.75h0c1.68-1.46,3.28-3,4.83-4.59c2.1-2.16,4.09-4.42,5.93-6.8c1.91-2.48,3.68-5.06,5.29-7.76c2.16-3.63,4.04-7.44,5.6-11.4h0c0,0,0,0,0,0H189.51c-1.19-2.5-2.22-5.1-3.1-7.76H325.5c0,0,0,0,0,0h0c0.2-0.71,0.37-1.44,0.55-2.16c0.57-2.31,1.03-4.65,1.39-7.04c0.11-0.73,0.22-1.46,0.31-2.2c0.31-2.54,0.49-5.14,0.55-7.76c0.02-0.57,0.02-1.13,0.02-1.71C328.32,246.72,328.12,243.49,327.72,240.31z M250,316.92c-11.28,0-21.91-2.8-31.24-7.75h62.49C271.91,314.12,261.28,316.92,250,316.92z"/></svg></div>
+  <div class="in">
+    <div class="hero-badge" aria-hidden="true"><svg viewBox="170 168 160 164"><path fill="currentColor" d="M327.72,240.31h-11.5H183.78c4.7-32.32,32.61-57.23,66.22-57.23c29.53,0,54.66,19.23,63.51,45.83h11.92c-9.23-32.97-39.54-57.23-75.43-57.23c-39.9,0-72.93,30.01-77.72,68.63c-0.4,3.18-0.6,6.41-0.6,9.68c0,0.57,0,1.14,0.02,1.71h11.4h133.8c-0.07,2.63-0.29,5.21-0.65,7.76c0,0,0,0,0,0h-132.5c0,0,0,0,0,0h-11.5c0.01,0.1,0.03,0.2,0.04,0.3c0.47,3.76,1.2,7.44,2.19,11.01c0.01,0.03,0.01,0.05,0.02,0.08c0.74,2.64,1.6,5.24,2.59,7.76c1.22,3.1,2.64,6.09,4.23,8.99c0.45,0.81,0.9,1.62,1.37,2.41h0c0,0,0,0,0,0h13.7c0,0,0,0,0,0h107.21c0,0,0,0,0,0c-2.06,2.75-4.32,5.35-6.78,7.75H187.98c0,0,0,0,0,0h-0.01c0.89,1.16,1.83,2.28,2.78,3.38c1.99,2.31,4.13,4.49,6.38,6.55c0.53,0.49,1.06,0.99,1.6,1.46c3.32,2.87,6.86,5.47,10.62,7.76c0,0,0,0,0,0h0c6.18,3.77,12.92,6.69,20.05,8.64c6.56,1.79,13.47,2.76,20.59,2.76c7.35,0,14.46-1.02,21.21-2.92c5.2-1.47,10.19-3.45,14.9-5.91c1.54-0.81,3.06-1.66,4.54-2.57c3.75-2.29,7.3-4.88,10.61-7.75h0c1.68-1.46,3.28-3,4.83-4.59c2.1-2.16,4.09-4.42,5.93-6.8c1.91-2.48,3.68-5.06,5.29-7.76c2.16-3.63,4.04-7.44,5.6-11.4h0c0,0,0,0,0,0H189.51c-1.19-2.5-2.22-5.1-3.1-7.76H325.5c0,0,0,0,0,0h0c0.2-0.71,0.37-1.44,0.55-2.16c0.57-2.31,1.03-4.65,1.39-7.04c0.11-0.73,0.22-1.46,0.31-2.2c0.31-2.54,0.49-5.14,0.55-7.76c0.02-0.57,0.02-1.13,0.02-1.71C328.32,246.72,328.12,243.49,327.72,240.31z M250,316.92c-11.28,0-21.91-2.8-31.24-7.75h62.49C271.91,314.12,261.28,316.92,250,316.92z"/></svg></div>
+    <div class="eyebrow">Systematic trading · professionally paranoid</div>
+    <h1>Tested to fail. Built to last.</h1>
+    <p>We build bots that trade the markets, then spend most of our time trying to prove they're wrong. The few that survive trade live, on a short leash. Right now we're just making our own desk work. If you're curious how, have a look around.</p>
+    <div class="cta"><a class="btn" href="#record">See the strategies</a><a class="btn ghost" href="#crew">Meet the crew</a></div>
+  </div>
+</header>
+
+<section class="pad" id="what">
+  <div class="in">
+    <h2 class="title" style="margin-bottom:28px">What we do, in plain words</h2>
+    <div class="three">
+      <div><h3>We build trading bots</h3><p>Automated strategies for any market we can test: indices, currencies, energy, metals and rates. No gut feelings, no 3 a.m. hunches.</p></div>
+      <div><h3>We try hard to break them</h3><p>Most ideas look brilliant for about an hour. A team of AI agents tests, attacks and retests until the weak ones sink.</p></div>
+      <div><h3>The survivors trade, carefully</h3><p>Every fill is checked, loss limits act on their own, and one human signs off. The bots do not get the car keys.</p></div>
+    </div>
+    <p class="intro" style="margin:24px 0 0">Below is the voyage every strategy takes. Nothing here is for sale. If one day we open it up, the <a href="#waitlist">list</a> hears first.</p>
+  </div>
+</section>
+
+<div class="band k1"><div class="in"><div class="lab">01 · DIVE<img class="crewpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Ccircle%20cx='20'%20cy='22'%20r='3.5'%20fill='none'%20stroke='%237fd8cf'%20stroke-width='2.5'/%3E%3Ccircle%20cx='13'%20cy='12'%20r='5'%20fill='none'%20stroke='%237fd8cf'%20stroke-width='2.5'/%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%232b8f87'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='48'%20cy='52'%20r='19'%20fill='%23dff3f1'%20stroke='%23cfd8da'%20stroke-width='5'/%3E%3Ccircle%20cx='48'%20cy='52'%20r='19'%20fill='none'%20stroke='%239aa7aa'%20stroke-width='1.5'/%3E%3Ccircle%20cx='39.9'%20cy='52'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='52'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='50.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='50.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2057.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='56.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='56.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Crect%20x='44'%20y='27'%20width='8'%20height='6'%20rx='2'%20fill='%23cfd8da'/%3E%3C/svg%3E" alt=""></div><div class="txt"><h2>Diver goes looking</h2><p>Each night a research agent tests new ideas on years of 1-minute data, with realistic costs, neighbouring settings and walk-forward windows. Every run is logged, failures included. Especially the failures.</p></div></div></div>
+<div class="band k2"><div class="in"><div class="lab">02 · CURRENT<img class="crewpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Cpath%20d='M58%2020%20a9%209%200%200%201%2017%20-3%20a7%207%200%200%201%209%209%20a5%205%200%200%201%20-2%209%20H60%20a6%206%200%200%201%20-2%20-15%20Z'%20fill='%23e9eef0'/%3E%3Cpath%20d='M71%2036%20L66%2045%20H71%20L67%2053'%20fill='none'%20stroke='%23F2C14E'%20stroke-width='3.5'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Cpath%20d='M18%2082%20C16%2060%2026%2040%2046%2038%20C58%2037%2062%2046%2056%2050%20C66%2046%2076%2054%2078%2066%20C80%2076%2078%2082%2078%2082%20Z'%20fill='%230e4f59'/%3E%3Cpath%20d='M46%2038%20C58%2037%2062%2046%2056%2050%20C52%2052%2048%2048%2050%2044'%20fill='none'%20stroke='%237fd8cf'%20stroke-width='3'%20stroke-linecap='round'/%3E%3Cpath%20d='M10%2084%20q8%20-6%2016%200%20t16%200%20t16%200%20t16%200%20t16%200'%20fill='none'%20stroke='%232b8f87'%20stroke-width='3.5'%20stroke-linecap='round'/%3E%3Ccircle%20cx='35.9'%20cy='64'%20r='3.06'%20fill='%23ffffff'/%3E%3Ccircle%20cx='52.1'%20cy='64'%20r='3.06'%20fill='%23ffffff'/%3E%3Ccircle%20cx='36.8'%20cy='62.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='53.0'%20cy='62.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M40.4%2069.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%23ffffff'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='30.5'%20cy='68.5'%20rx='3.6'%20ry='2.16'%20fill='%23e88a8a'%20opacity='.8'/%3E%3Cellipse%20cx='57.5'%20cy='68.5'%20rx='3.6'%20ry='2.16'%20fill='%23e88a8a'%20opacity='.8'/%3E%3C/svg%3E" alt=""></div><div class="txt"><h2>Undertow pushes back and manages the storms</h2><p>A separate red team reproduces the result and attacks it: look-ahead, unrealistic fills, overfitting, one lucky year. Most ideas stop here. The survivors get risk management: how they fit in a portfolio, daily loss limits and the worst-case drawdown for each account. Undertow is not fun at parties.</p></div></div></div>
+<div class="band k3"><div class="in"><div class="lab">03 · BUILD<img class="crewpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%23e2b866'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='39.9'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2067.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cpath%20d='M24%2044%20C24%2028%2072%2028%2072%2044%20Z'%20fill='%23F2C14E'/%3E%3Crect%20x='19'%20y='42'%20width='58'%20height='6'%20rx='3'%20fill='%23d9a92e'/%3E%3Crect%20x='45'%20y='26'%20width='6'%20height='10'%20rx='3'%20fill='%23d9a92e'/%3E%3Cg%20transform='rotate%28-35%2080%2070%29'%3E%3Crect%20x='77'%20y='58'%20width='6'%20height='24'%20rx='3'%20fill='%236f8b90'/%3E%3Cpath%20d='M74%2056%20a6%206%200%201%201%2012%200%20l-3%200%20l0%20-4%20l-6%200%20l0%204%20Z'%20fill='%236f8b90'/%3E%3C/g%3E%3C/svg%3E" alt=""></div><div class="txt"><h2>Keel builds the boat</h2><p>Survivors are coded in NinjaTrader 8 with two reviews, timing and order safety, then matched trade by trade against the research engine. If they disagree, nobody sails.</p></div></div></div>
+<div class="band k4"><div class="in"><div class="lab">04 · SEA TRIAL<img class="crewpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%23e8826a'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='39.9'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2067.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f6b3a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f6b3a0'%20opacity='.8'/%3E%3Cellipse%20cx='48'%20cy='38'%20rx='24'%20ry='7'%20fill='%23ffffff'%20stroke='%23d7dfe1'%20stroke-width='1.5'/%3E%3Cpath%20d='M28%2038%20C30%2026%2066%2026%2068%2038%20Z'%20fill='%23ffffff'/%3E%3Crect%20x='27'%20y='35'%20width='42'%20height='5'%20rx='2.5'%20fill='%23044959'/%3E%3Cpath%20d='M58%2072%20Q70%2070%2078%2076'%20fill='none'%20stroke='%23c9a24a'%20stroke-width='4'%20stroke-linecap='round'/%3E%3Ccircle%20cx='81'%20cy='78'%20r='5'%20fill='%23E9B949'/%3E%3Cpath%20d='M84%2064%20q4%203%200%207%20M88%2060%20q7%206%200%2014'%20fill='none'%20stroke='%232b8f87'%20stroke-width='2.5'%20stroke-linecap='round'/%3E%3C/svg%3E" alt=""></div><div class="txt"><h2>Bosun runs the sea trial</h2><p>Each strategy runs on its own simulation account. After every close, every fill is checked against the plan and the backtest. Bosun has never missed a close.</p></div></div></div>
+<div class="band k5"><div class="in"><div class="lab">05 · HARBOUR<img class="crewpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%234fae8f'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='39.9'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2067.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cpath%20d='M24%2042%20C22%2028%2074%2028%2072%2042%20Z'%20fill='%23044959'/%3E%3Crect%20x='21'%20y='40'%20width='54'%20height='6'%20rx='3'%20fill='%2302343f'/%3E%3Cpath%20d='M22%2046%20q26%206%2052%200'%20fill='none'%20stroke='%2302343f'%20stroke-width='3'/%3E%3Ccircle%20cx='48'%20cy='34'%20r='3'%20fill='none'%20stroke='%23E9B949'%20stroke-width='1.8'/%3E%3Cpath%20d='M48%2037%20V42%20M45%2039%20H51'%20stroke='%23E9B949'%20stroke-width='1.8'%20stroke-linecap='round'/%3E%3C/svg%3E" alt=""></div><div class="txt"><h2>Harbor brings it to the decision</h2><p>The desk manager puts the evidence and the question in one brief. One person decides the account, the size and the loss limits, in writing. The agents advise; the human signs.</p></div></div></div>
+<div class="band k6 last"><div class="in"><div class="lab">06 · LIGHTHOUSE<img class="crewpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Cpath%20d='M60%2024%20L90%2014%20V34%20Z'%20fill='%23F2C14E'%20opacity='.85'/%3E%3Cpath%20d='M34%2036%20H62%20L68%2086%20H28%20Z'%20fill='%23f7f2e8'/%3E%3Cpath%20d='M32.2%2052%20H63.8%20L65.1%2063%20H30.9%20Z'%20fill='%23e06a5a'/%3E%3Cpath%20d='M30%2074%20H66%20L67.4%2086%20H28.6%20Z'%20fill='%23e06a5a'/%3E%3Crect%20x='38'%20y='20'%20width='20'%20height='14'%20rx='3'%20fill='%23F2C14E'/%3E%3Cpath%20d='M34%2021%20L48%209%20L62%2021%20Z'%20fill='%23044959'/%3E%3Crect%20x='32'%20y='33'%20width='32'%20height='4'%20rx='2'%20fill='%23044959'/%3E%3Ccircle%20cx='41.7'%20cy='45'%20r='2.38'%20fill='%2306222a'/%3E%3Ccircle%20cx='54.3'%20cy='45'%20r='2.38'%20fill='%2306222a'/%3E%3Ccircle%20cx='42.4'%20cy='44.16'%20r='0.7'%20fill='%23fff'/%3E%3Ccircle%20cx='55.0'%20cy='44.16'%20r='0.7'%20fill='%23fff'/%3E%3Cpath%20d='M45.2%2049.2%20q2.8%202.8%205.6%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.54'%20stroke-linecap='round'/%3E%3Cellipse%20cx='37.5'%20cy='48.5'%20rx='2.8'%20ry='1.68'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='58.5'%20cy='48.5'%20rx='2.8'%20ry='1.68'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3C/svg%3E" alt=""></div><div class="txt"><h2>Lighthouse keeps watch</h2><p>Live strategies are checked every day against their own history. A daily loss limit closes the trade and stops the account, and no account ever holds long and short at once.</p></div></div></div>
+
+<section id="record" class="pad">
+  <div class="in">
+    <h2 class="title">Strategies</h2>
+    <div id="liveShelf" hidden>
+    <p class="intro">Real market, real time, simulated money for now. Our top 3 by live result plus the portfolio account, updated by Bosun after every close. The rest of the fleet keeps sailing, just not on this shelf.</p>
+    <div class="bt-head"><h3>Top 3 + portfolio, last 2 trading days</h3><span>NINJATRADER 8 SIM · MNQ · NOV 12 – 13, 2026 · 1 CONTRACT · AFTER COSTS</span></div>
+    <div class="bts">
+      <div class="bt"><span class="tag">TOP 1 · LIVE SIM</span><h4>Strategy 1</h4><div class="ratio">+$326<small>net, 2 days</small></div><dl><dt>Trades</dt><dd>1</dd><dt>Account</dt><dd>Sim102</dd><dt>Days</dt><dd>2</dd></dl><div class="foot">One trade, one win. We are not buying a yacht yet.</div></div>
+      <div class="bt"><span class="tag">TOP 2 · LIVE SIM</span><h4>Strategy 2</h4><div class="ratio">+$117.50<small>net, 2 days</small></div><dl><dt>Trades</dt><dd>1</dd><dt>Account</dt><dd>Sim107</dd><dt>Days</dt><dd>2</dd></dl><div class="foot">Quiet, tidy, done by lunch.</div></div>
+      <div class="bt"><span class="tag">TOP 3 · LIVE SIM</span><h4>Strategy 3</h4><div class="ratio">$0<small>net, 2 days</small></div><dl><dt>Trades</dt><dd>1</dd><dt>Account</dt><dd>Sim108</dd><dt>Days</dt><dd>2</dd></dl><div class="foot">Broke even after costs. We count it anyway.</div></div>
+      <div class="bt port"><span class="tag">PORTFOLIO · LIVE SIM</span><h4>Portfolio account</h4><div class="ratio">−$496.50<small>net, 2 days</small></div><dl><dt>Trades</dt><dd>12</dd><dt>Account</dt><dd>Sim110</dd><dt>Last day</dt><dd>+$74</dd></dl><div class="foot">Four strategies sharing one account. A rough start, and we show those too.</div></div>
+    </div>
+    <p class="intro" style="margin:14px 0 0;font-size:14px">Simulated accounts in NinjaTrader 8 on live market data, 1 contract, after costs. Two days is far too little to judge anything: this shelf is here so you can watch the record grow, bad days included. Simulated results are not real trading and do not predict future results.</p>
+    </div>
+    <p class="intro">The strategies we run, each tested in NinjaTrader 8 on real market data before it was allowed to trade. Live results join this shelf once there are enough of them to mean something.</p>
+
+    <div class="bt-head" style="margin-top:28px"><h3>Real strategies, backtested over 5 years</h3><span>NINJATRADER 8 BACKTEST · MNQ · JUN 2021 – NOV 2026 · 1 CONTRACT · AFTER $2 A TRADE</span></div>
+    <div class="bts">
+      <div class="bt"><span class="tag">TOP A · 5-YEAR BACKTEST</span><h4>Strategy A</h4><div class="ratio">22.9<small>net / max drawdown</small></div><dl><dt>Net</dt><dd>+$34,930</dd><dt>Max drawdown</dt><dd>−$1,524</dd><dt>Trades</dt><dd>663</dd><dt>Positive years</dt><dd>6 of 6</dd></dl><div class="foot">Steady. Almost boring. We like boring.</div></div>
+      <div class="bt"><span class="tag">TOP B · 5-YEAR BACKTEST</span><h4>Strategy B</h4><div class="ratio">12.8<small>net / max drawdown</small></div><dl><dt>Net</dt><dd>+$29,000</dd><dt>Max drawdown</dt><dd>−$2,260</dd><dt>Trades</dt><dd>2,593</dd><dt>Positive years</dt><dd>6 of 6</dd></dl><div class="foot">The busy one. Trades a lot, complains little.</div></div>
+      <div class="bt"><span class="tag">TOP C · 5-YEAR BACKTEST</span><h4>Strategy C</h4><div class="ratio">11.7<small>net / max drawdown</small></div><dl><dt>Net</dt><dd>+$21,535</dd><dt>Max drawdown</dt><dd>−$1,836</dd><dt>Trades</dt><dd>488</dd><dt>Positive years</dt><dd>5 of 6</dd></dl><div class="foot">One off year. Nobody's perfect.</div></div>
+      <div class="bt port"><span class="tag">PORTFOLIO · 5-YEAR BACKTEST</span><h4>A + B + C</h4><div class="ratio">24.9<small>net / max drawdown</small></div><dl><dt>Net</dt><dd>+$85,464</dd><dt>Max drawdown</dt><dd>−$3,430</dd><dt>Trades</dt><dd>3,744</dd><dt>Positive years</dt><dd>6 of 6</dd></dl><div class="foot">All three together, 1 contract each · drawdown on daily totals</div></div>
+    </div>
+    <p class="intro" style="margin:14px 0 0;font-size:14px">Backtests are hypothetical and were run on data that also helped choose the settings. They show how each strategy behaved in the past, not what it will do. Live trading is the real test, and those results will be shown here once there are enough of them. Backtest and live rankings are kept separately, so Strategy A is not necessarily Strategy 1.</p>
+  </div>
+</section>
+
+<section class="pad" style="padding-top:0">
+  <div class="in">
+    <h2 class="title" style="margin-bottom:28px">What never changes</h2>
+    <div class="three">
+      <div><h3>Loss limits act on their own</h3><p>At the limit, positions close and the day ends.</p></div>
+      <div><h3>Drawdown first</h3><p>Profit is always judged against the worst drawdown in dollars.</p></div>
+      <div><h3>Simple wins ties</h3><p>Between two similar results, fewer rules stay.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="crew" class="pad crew-wrap">
+  <div class="in">
+    <h2 class="title">Meet the crew</h2>
+    <p class="intro">Six AI agents and one very patient boat. They find, test, build and guard every strategy; the human brings the coffee and the final yes. Not for sale: this is how our own desk runs.</p>
+    <img class="lineup" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20760%20120'%3E%3Cpath%20d='M0%20106%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20q15%20-7%2030%200%20t30%200%20'%20fill='none'%20stroke='%2391cfc7'%20stroke-width='3'%20stroke-linecap='round'/%3E%3Cg%20transform='translate%286%2010%29%20scale%281%29'%3E%3Ccircle%20cx='20'%20cy='22'%20r='3.5'%20fill='none'%20stroke='%237fd8cf'%20stroke-width='2.5'/%3E%3Ccircle%20cx='13'%20cy='12'%20r='5'%20fill='none'%20stroke='%237fd8cf'%20stroke-width='2.5'/%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%232b8f87'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='48'%20cy='52'%20r='19'%20fill='%23dff3f1'%20stroke='%23cfd8da'%20stroke-width='5'/%3E%3Ccircle%20cx='48'%20cy='52'%20r='19'%20fill='none'%20stroke='%239aa7aa'%20stroke-width='1.5'/%3E%3Ccircle%20cx='39.9'%20cy='52'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='52'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='50.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='50.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2057.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='56.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='56.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Crect%20x='44'%20y='27'%20width='8'%20height='6'%20rx='2'%20fill='%23cfd8da'/%3E%3C/g%3E%3Cg%20transform='translate%28114%2010%29%20scale%281%29'%3E%3Cpath%20d='M58%2020%20a9%209%200%200%201%2017%20-3%20a7%207%200%200%201%209%209%20a5%205%200%200%201%20-2%209%20H60%20a6%206%200%200%201%20-2%20-15%20Z'%20fill='%23e9eef0'/%3E%3Cpath%20d='M71%2036%20L66%2045%20H71%20L67%2053'%20fill='none'%20stroke='%23F2C14E'%20stroke-width='3.5'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Cpath%20d='M18%2082%20C16%2060%2026%2040%2046%2038%20C58%2037%2062%2046%2056%2050%20C66%2046%2076%2054%2078%2066%20C80%2076%2078%2082%2078%2082%20Z'%20fill='%230e4f59'/%3E%3Cpath%20d='M46%2038%20C58%2037%2062%2046%2056%2050%20C52%2052%2048%2048%2050%2044'%20fill='none'%20stroke='%237fd8cf'%20stroke-width='3'%20stroke-linecap='round'/%3E%3Cpath%20d='M10%2084%20q8%20-6%2016%200%20t16%200%20t16%200%20t16%200%20t16%200'%20fill='none'%20stroke='%232b8f87'%20stroke-width='3.5'%20stroke-linecap='round'/%3E%3Ccircle%20cx='35.9'%20cy='64'%20r='3.06'%20fill='%23ffffff'/%3E%3Ccircle%20cx='52.1'%20cy='64'%20r='3.06'%20fill='%23ffffff'/%3E%3Ccircle%20cx='36.8'%20cy='62.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='53.0'%20cy='62.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M40.4%2069.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%23ffffff'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='30.5'%20cy='68.5'%20rx='3.6'%20ry='2.16'%20fill='%23e88a8a'%20opacity='.8'/%3E%3Cellipse%20cx='57.5'%20cy='68.5'%20rx='3.6'%20ry='2.16'%20fill='%23e88a8a'%20opacity='.8'/%3E%3C/g%3E%3Cg%20transform='translate%28222%2010%29%20scale%281%29'%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%23e2b866'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='39.9'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2067.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cpath%20d='M24%2044%20C24%2028%2072%2028%2072%2044%20Z'%20fill='%23F2C14E'/%3E%3Crect%20x='19'%20y='42'%20width='58'%20height='6'%20rx='3'%20fill='%23d9a92e'/%3E%3Crect%20x='45'%20y='26'%20width='6'%20height='10'%20rx='3'%20fill='%23d9a92e'/%3E%3Cg%20transform='rotate%28-35%2080%2070%29'%3E%3Crect%20x='77'%20y='58'%20width='6'%20height='24'%20rx='3'%20fill='%236f8b90'/%3E%3Cpath%20d='M74%2056%20a6%206%200%201%201%2012%200%20l-3%200%20l0%20-4%20l-6%200%20l0%204%20Z'%20fill='%236f8b90'/%3E%3C/g%3E%3C/g%3E%3Cg%20transform='translate%28330%200%29%20scale%281.15%29'%3E%3Cpath%20d='M50%2010%20V60'%20stroke='%239fb3b2'%20stroke-width='3'%20stroke-linecap='round'/%3E%3Cpath%20d='M53%2012%20C70%2024%2078%2042%2080%2058%20H53%20Z'%20fill='%232b8f87'/%3E%3Csvg%20x='57'%20y='30'%20width='18'%20height='18'%20viewBox='170%20168%20160%20164'%3E%3Cpath%20fill='%23ffffff'%20d='M327.72,240.31h-11.5H183.78c4.7-32.32,32.61-57.23,66.22-57.23c29.53,0,54.66,19.23,63.51,45.83h11.92c-9.23-32.97-39.54-57.23-75.43-57.23c-39.9,0-72.93,30.01-77.72,68.63c-0.4,3.18-0.6,6.41-0.6,9.68c0,0.57,0,1.14,0.02,1.71h11.4h133.8c-0.07,2.63-0.29,5.21-0.65,7.76h-132.5h-11.5c0.01,0.1,0.03,0.2,0.04,0.3c0.47,3.76,1.2,7.44,2.19,11.01c0.01,0.03,0.01,0.05,0.02,0.08c0.74,2.64,1.6,5.24,2.59,7.76c1.22,3.1,2.64,6.09,4.23,8.99c0.45,0.81,0.9,1.62,1.37,2.41h13.7h107.21c-2.06,2.75-4.32,5.35-6.78,7.75H187.97c0.89,1.16,1.83,2.28,2.78,3.38c1.99,2.31,4.13,4.49,6.38,6.55c0.53,0.49,1.06,0.99,1.6,1.46c3.32,2.87,6.86,5.47,10.62,7.76c6.18,3.77,12.92,6.69,20.05,8.64c6.56,1.79,13.47,2.76,20.59,2.76c7.35,0,14.46-1.02,21.21-2.92c5.2-1.47,10.19-3.45,14.9-5.91c1.54-0.81,3.06-1.66,4.54-2.57c3.75-2.29,7.3-4.88,10.61-7.75c1.68-1.46,3.28-3,4.83-4.59c2.1-2.16,4.09-4.42,5.93-6.8c1.91-2.48,3.68-5.06,5.29-7.76c2.16-3.63,4.04-7.44,5.6-11.4H189.51c-1.19-2.5-2.22-5.1-3.1-7.76H325.5c0.2-0.71,0.37-1.44,0.55-2.16c0.57-2.31,1.03-4.65,1.39-7.04c0.11-0.73,0.22-1.46,0.31-2.2c0.31-2.54,0.49-5.14,0.55-7.76c0.02-0.57,0.02-1.13,0.02-1.71C328.32,246.72,328.12,243.49,327.72,240.31z%20M250,316.92c-11.28,0-21.91-2.8-31.24-7.75h62.49C271.91,314.12,261.28,316.92,250,316.92z'/%3E%3C/svg%3E%3Cpath%20d='M47%2018%20C36%2030%2030%2044%2028%2058%20H47%20Z'%20fill='%23f7f7f2'/%3E%3Cpath%20d='M12%2060%20H88%20C84%2074%2072%2082%2050%2082%20C28%2082%2016%2074%2012%2060%20Z'%20fill='%23044959'/%3E%3Cellipse%20cx='36'%20cy='66'%20rx='7'%20ry='3'%20fill='%23fff'%20opacity='.18'/%3E%3Ccircle%20cx='42.35'%20cy='69'%20r='2.8899999999999997'%20fill='%23ffffff'/%3E%3Ccircle%20cx='57.65'%20cy='69'%20r='2.8899999999999997'%20fill='%23ffffff'/%3E%3Ccircle%20cx='43.2'%20cy='67.98'%20r='0.85'%20fill='%23fff'/%3E%3Ccircle%20cx='58.5'%20cy='67.98'%20r='0.85'%20fill='%23fff'/%3E%3Cpath%20d='M46.6%2074.1%20q3.4%203.4%206.8%200'%20fill='none'%20stroke='%23ffffff'%20stroke-width='1.87'%20stroke-linecap='round'/%3E%3Cellipse%20cx='37.25'%20cy='73.25'%20rx='3.4'%20ry='2.04'%20fill='%23e88a8a'%20opacity='.8'/%3E%3Cellipse%20cx='62.75'%20cy='73.25'%20rx='3.4'%20ry='2.04'%20fill='%23e88a8a'%20opacity='.8'/%3E%3Cpath%20d='M6%2086%20q7%20-5%2014%200%20t14%200%20t14%200%20t14%200%20t14%200%20t14%200'%20fill='none'%20stroke='%2391cfc7'%20stroke-width='3'%20stroke-linecap='round'/%3E%3C/g%3E%3Cg%20transform='translate%28438%2010%29%20scale%281%29'%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%23e8826a'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='39.9'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2067.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f6b3a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f6b3a0'%20opacity='.8'/%3E%3Cellipse%20cx='48'%20cy='38'%20rx='24'%20ry='7'%20fill='%23ffffff'%20stroke='%23d7dfe1'%20stroke-width='1.5'/%3E%3Cpath%20d='M28%2038%20C30%2026%2066%2026%2068%2038%20Z'%20fill='%23ffffff'/%3E%3Crect%20x='27'%20y='35'%20width='42'%20height='5'%20rx='2.5'%20fill='%23044959'/%3E%3Cpath%20d='M58%2072%20Q70%2070%2078%2076'%20fill='none'%20stroke='%23c9a24a'%20stroke-width='4'%20stroke-linecap='round'/%3E%3Ccircle%20cx='81'%20cy='78'%20r='5'%20fill='%23E9B949'/%3E%3Cpath%20d='M84%2064%20q4%203%200%207%20M88%2060%20q7%206%200%2014'%20fill='none'%20stroke='%232b8f87'%20stroke-width='2.5'%20stroke-linecap='round'/%3E%3C/g%3E%3Cg%20transform='translate%28546%2010%29%20scale%281%29'%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%234fae8f'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='39.9'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2067.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cpath%20d='M24%2042%20C22%2028%2074%2028%2072%2042%20Z'%20fill='%23044959'/%3E%3Crect%20x='21'%20y='40'%20width='54'%20height='6'%20rx='3'%20fill='%2302343f'/%3E%3Cpath%20d='M22%2046%20q26%206%2052%200'%20fill='none'%20stroke='%2302343f'%20stroke-width='3'/%3E%3Ccircle%20cx='48'%20cy='34'%20r='3'%20fill='none'%20stroke='%23E9B949'%20stroke-width='1.8'/%3E%3Cpath%20d='M48%2037%20V42%20M45%2039%20H51'%20stroke='%23E9B949'%20stroke-width='1.8'%20stroke-linecap='round'/%3E%3C/g%3E%3Cg%20transform='translate%28654%2010%29%20scale%281%29'%3E%3Cpath%20d='M60%2024%20L90%2014%20V34%20Z'%20fill='%23F2C14E'%20opacity='.85'/%3E%3Cpath%20d='M34%2036%20H62%20L68%2086%20H28%20Z'%20fill='%23f7f2e8'/%3E%3Cpath%20d='M32.2%2052%20H63.8%20L65.1%2063%20H30.9%20Z'%20fill='%23e06a5a'/%3E%3Cpath%20d='M30%2074%20H66%20L67.4%2086%20H28.6%20Z'%20fill='%23e06a5a'/%3E%3Crect%20x='38'%20y='20'%20width='20'%20height='14'%20rx='3'%20fill='%23F2C14E'/%3E%3Cpath%20d='M34%2021%20L48%209%20L62%2021%20Z'%20fill='%23044959'/%3E%3Crect%20x='32'%20y='33'%20width='32'%20height='4'%20rx='2'%20fill='%23044959'/%3E%3Ccircle%20cx='41.7'%20cy='45'%20r='2.38'%20fill='%2306222a'/%3E%3Ccircle%20cx='54.3'%20cy='45'%20r='2.38'%20fill='%2306222a'/%3E%3Ccircle%20cx='42.4'%20cy='44.16'%20r='0.7'%20fill='%23fff'/%3E%3Ccircle%20cx='55.0'%20cy='44.16'%20r='0.7'%20fill='%23fff'/%3E%3Cpath%20d='M45.2%2049.2%20q2.8%202.8%205.6%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.54'%20stroke-linecap='round'/%3E%3Cellipse%20cx='37.5'%20cy='48.5'%20rx='2.8'%20ry='1.68'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='58.5'%20cy='48.5'%20rx='2.8'%20ry='1.68'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3C/g%3E%3C/svg%3E" alt="The TRADAL crew around Helm, the boat: Diver, Undertow, Keel, Bosun, Harbor and Lighthouse">
+    <div class="crew">
+      <div class="mod k1"><img class="modpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Ccircle%20cx='20'%20cy='22'%20r='3.5'%20fill='none'%20stroke='%237fd8cf'%20stroke-width='2.5'/%3E%3Ccircle%20cx='13'%20cy='12'%20r='5'%20fill='none'%20stroke='%237fd8cf'%20stroke-width='2.5'/%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%232b8f87'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='48'%20cy='52'%20r='19'%20fill='%23dff3f1'%20stroke='%23cfd8da'%20stroke-width='5'/%3E%3Ccircle%20cx='48'%20cy='52'%20r='19'%20fill='none'%20stroke='%239aa7aa'%20stroke-width='1.5'/%3E%3Ccircle%20cx='39.9'%20cy='52'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='52'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='50.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='50.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2057.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='56.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='56.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Crect%20x='44'%20y='27'%20width='8'%20height='6'%20rx='2'%20fill='%23cfd8da'/%3E%3C/svg%3E" alt=""><div class="t">01 · DIVE</div><h3>Diver · Strategy Builder</h3><p>Backtests your idea with costs, nearby settings, walk-forward and a trial log.</p><div class="need"><b>Needs:</b> Claude, your data</div></div>
+      <div class="mod k2"><img class="modpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Cpath%20d='M58%2020%20a9%209%200%200%201%2017%20-3%20a7%207%200%200%201%209%209%20a5%205%200%200%201%20-2%209%20H60%20a6%206%200%200%201%20-2%20-15%20Z'%20fill='%23e9eef0'/%3E%3Cpath%20d='M71%2036%20L66%2045%20H71%20L67%2053'%20fill='none'%20stroke='%23F2C14E'%20stroke-width='3.5'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Cpath%20d='M18%2082%20C16%2060%2026%2040%2046%2038%20C58%2037%2062%2046%2056%2050%20C66%2046%2076%2054%2078%2066%20C80%2076%2078%2082%2078%2082%20Z'%20fill='%230e4f59'/%3E%3Cpath%20d='M46%2038%20C58%2037%2062%2046%2056%2050%20C52%2052%2048%2048%2050%2044'%20fill='none'%20stroke='%237fd8cf'%20stroke-width='3'%20stroke-linecap='round'/%3E%3Cpath%20d='M10%2084%20q8%20-6%2016%200%20t16%200%20t16%200%20t16%200%20t16%200'%20fill='none'%20stroke='%232b8f87'%20stroke-width='3.5'%20stroke-linecap='round'/%3E%3Ccircle%20cx='35.9'%20cy='64'%20r='3.06'%20fill='%23ffffff'/%3E%3Ccircle%20cx='52.1'%20cy='64'%20r='3.06'%20fill='%23ffffff'/%3E%3Ccircle%20cx='36.8'%20cy='62.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='53.0'%20cy='62.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M40.4%2069.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%23ffffff'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='30.5'%20cy='68.5'%20rx='3.6'%20ry='2.16'%20fill='%23e88a8a'%20opacity='.8'/%3E%3Cellipse%20cx='57.5'%20cy='68.5'%20rx='3.6'%20ry='2.16'%20fill='%23e88a8a'%20opacity='.8'/%3E%3C/svg%3E" alt=""><div class="t">02 · CURRENT</div><h3>Undertow · Risk Management</h3><p>Red team, risk management, account portfolios, daily loss limits and prop-firm odds.</p><div class="need"><b>Needs:</b> Claude, your trades</div></div>
+      <div class="mod k3"><img class="modpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%23e2b866'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='39.9'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2067.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cpath%20d='M24%2044%20C24%2028%2072%2028%2072%2044%20Z'%20fill='%23F2C14E'/%3E%3Crect%20x='19'%20y='42'%20width='58'%20height='6'%20rx='3'%20fill='%23d9a92e'/%3E%3Crect%20x='45'%20y='26'%20width='6'%20height='10'%20rx='3'%20fill='%23d9a92e'/%3E%3Cg%20transform='rotate%28-35%2080%2070%29'%3E%3Crect%20x='77'%20y='58'%20width='6'%20height='24'%20rx='3'%20fill='%236f8b90'/%3E%3Cpath%20d='M74%2056%20a6%206%200%201%201%2012%200%20l-3%200%20l0%20-4%20l-6%200%20l0%204%20Z'%20fill='%236f8b90'/%3E%3C/g%3E%3C/svg%3E" alt=""><div class="t">03 · BUILD</div><h3>Keel · Build and Operations</h3><p>NinjaTrader 8 code with safety reviews and backtest matching.</p><div class="need"><b>Needs:</b> Claude, NinjaTrader 8</div></div>
+      <div class="mod k4"><img class="modpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%23e8826a'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='39.9'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2067.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f6b3a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f6b3a0'%20opacity='.8'/%3E%3Cellipse%20cx='48'%20cy='38'%20rx='24'%20ry='7'%20fill='%23ffffff'%20stroke='%23d7dfe1'%20stroke-width='1.5'/%3E%3Cpath%20d='M28%2038%20C30%2026%2066%2026%2068%2038%20Z'%20fill='%23ffffff'/%3E%3Crect%20x='27'%20y='35'%20width='42'%20height='5'%20rx='2.5'%20fill='%23044959'/%3E%3Cpath%20d='M58%2072%20Q70%2070%2078%2076'%20fill='none'%20stroke='%23c9a24a'%20stroke-width='4'%20stroke-linecap='round'/%3E%3Ccircle%20cx='81'%20cy='78'%20r='5'%20fill='%23E9B949'/%3E%3Cpath%20d='M84%2064%20q4%203%200%207%20M88%2060%20q7%206%200%2014'%20fill='none'%20stroke='%232b8f87'%20stroke-width='2.5'%20stroke-linecap='round'/%3E%3C/svg%3E" alt=""><div class="t">04 · SEA TRIAL</div><h3>Bosun · Sim Monitor</h3><p>Every fill checked after the close; forward-test gates.</p><div class="need"><b>Needs:</b> Claude, NinjaTrader 8</div></div>
+      <div class="mod k5"><img class="modpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Cellipse%20cx='48'%20cy='60'%20rx='29'%20ry='27'%20fill='%234fae8f'/%3E%3Cellipse%20cx='40'%20cy='48'%20rx='8'%20ry='5'%20fill='%23fff'%20opacity='.25'/%3E%3Ccircle%20cx='39.9'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='56.1'%20cy='62'%20r='3.06'%20fill='%2306222a'/%3E%3Ccircle%20cx='40.8'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Ccircle%20cx='57.0'%20cy='60.92'%20r='0.9'%20fill='%23fff'/%3E%3Cpath%20d='M44.4%2067.4%20q3.6%203.6%207.2%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.9800000000000002'%20stroke-linecap='round'/%3E%3Cellipse%20cx='34.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='61.5'%20cy='66.5'%20rx='3.6'%20ry='2.16'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cpath%20d='M24%2042%20C22%2028%2074%2028%2072%2042%20Z'%20fill='%23044959'/%3E%3Crect%20x='21'%20y='40'%20width='54'%20height='6'%20rx='3'%20fill='%2302343f'/%3E%3Cpath%20d='M22%2046%20q26%206%2052%200'%20fill='none'%20stroke='%2302343f'%20stroke-width='3'/%3E%3Ccircle%20cx='48'%20cy='34'%20r='3'%20fill='none'%20stroke='%23E9B949'%20stroke-width='1.8'/%3E%3Cpath%20d='M48%2037%20V42%20M45%2039%20H51'%20stroke='%23E9B949'%20stroke-width='1.8'%20stroke-linecap='round'/%3E%3C/svg%3E" alt=""><div class="t">05 · HARBOUR</div><h3>Harbor · Desk Brief</h3><p>Results and every decision waiting, one click each.</p><div class="need"><b>Needs:</b> Claude</div></div>
+      <div class="mod k6"><img class="modpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Cpath%20d='M60%2024%20L90%2014%20V34%20Z'%20fill='%23F2C14E'%20opacity='.85'/%3E%3Cpath%20d='M34%2036%20H62%20L68%2086%20H28%20Z'%20fill='%23f7f2e8'/%3E%3Cpath%20d='M32.2%2052%20H63.8%20L65.1%2063%20H30.9%20Z'%20fill='%23e06a5a'/%3E%3Cpath%20d='M30%2074%20H66%20L67.4%2086%20H28.6%20Z'%20fill='%23e06a5a'/%3E%3Crect%20x='38'%20y='20'%20width='20'%20height='14'%20rx='3'%20fill='%23F2C14E'/%3E%3Cpath%20d='M34%2021%20L48%209%20L62%2021%20Z'%20fill='%23044959'/%3E%3Crect%20x='32'%20y='33'%20width='32'%20height='4'%20rx='2'%20fill='%23044959'/%3E%3Ccircle%20cx='41.7'%20cy='45'%20r='2.38'%20fill='%2306222a'/%3E%3Ccircle%20cx='54.3'%20cy='45'%20r='2.38'%20fill='%2306222a'/%3E%3Ccircle%20cx='42.4'%20cy='44.16'%20r='0.7'%20fill='%23fff'/%3E%3Ccircle%20cx='55.0'%20cy='44.16'%20r='0.7'%20fill='%23fff'/%3E%3Cpath%20d='M45.2%2049.2%20q2.8%202.8%205.6%200'%20fill='none'%20stroke='%2306222a'%20stroke-width='1.54'%20stroke-linecap='round'/%3E%3Cellipse%20cx='37.5'%20cy='48.5'%20rx='2.8'%20ry='1.68'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3Cellipse%20cx='58.5'%20cy='48.5'%20rx='2.8'%20ry='1.68'%20fill='%23f4a6a0'%20opacity='.8'/%3E%3C/svg%3E" alt=""><div class="t">06 · LIGHTHOUSE</div><h3>Lighthouse · Dashboard</h3><p>Private web dashboard with its own login.</p><div class="need"><b>Needs:</b> a browser</div></div>
+      <div class="boat"><img class="boatpic" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%20width='96'%20height='96'%3E%3Cpath%20d='M50%2010%20V60'%20stroke='%239fb3b2'%20stroke-width='3'%20stroke-linecap='round'/%3E%3Cpath%20d='M53%2012%20C70%2024%2078%2042%2080%2058%20H53%20Z'%20fill='%232b8f87'/%3E%3Csvg%20x='57'%20y='30'%20width='18'%20height='18'%20viewBox='170%20168%20160%20164'%3E%3Cpath%20fill='%23ffffff'%20d='M327.72,240.31h-11.5H183.78c4.7-32.32,32.61-57.23,66.22-57.23c29.53,0,54.66,19.23,63.51,45.83h11.92c-9.23-32.97-39.54-57.23-75.43-57.23c-39.9,0-72.93,30.01-77.72,68.63c-0.4,3.18-0.6,6.41-0.6,9.68c0,0.57,0,1.14,0.02,1.71h11.4h133.8c-0.07,2.63-0.29,5.21-0.65,7.76h-132.5h-11.5c0.01,0.1,0.03,0.2,0.04,0.3c0.47,3.76,1.2,7.44,2.19,11.01c0.01,0.03,0.01,0.05,0.02,0.08c0.74,2.64,1.6,5.24,2.59,7.76c1.22,3.1,2.64,6.09,4.23,8.99c0.45,0.81,0.9,1.62,1.37,2.41h13.7h107.21c-2.06,2.75-4.32,5.35-6.78,7.75H187.97c0.89,1.16,1.83,2.28,2.78,3.38c1.99,2.31,4.13,4.49,6.38,6.55c0.53,0.49,1.06,0.99,1.6,1.46c3.32,2.87,6.86,5.47,10.62,7.76c6.18,3.77,12.92,6.69,20.05,8.64c6.56,1.79,13.47,2.76,20.59,2.76c7.35,0,14.46-1.02,21.21-2.92c5.2-1.47,10.19-3.45,14.9-5.91c1.54-0.81,3.06-1.66,4.54-2.57c3.75-2.29,7.3-4.88,10.61-7.75c1.68-1.46,3.28-3,4.83-4.59c2.1-2.16,4.09-4.42,5.93-6.8c1.91-2.48,3.68-5.06,5.29-7.76c2.16-3.63,4.04-7.44,5.6-11.4H189.51c-1.19-2.5-2.22-5.1-3.1-7.76H325.5c0.2-0.71,0.37-1.44,0.55-2.16c0.57-2.31,1.03-4.65,1.39-7.04c0.11-0.73,0.22-1.46,0.31-2.2c0.31-2.54,0.49-5.14,0.55-7.76c0.02-0.57,0.02-1.13,0.02-1.71C328.32,246.72,328.12,243.49,327.72,240.31z%20M250,316.92c-11.28,0-21.91-2.8-31.24-7.75h62.49C271.91,314.12,261.28,316.92,250,316.92z'/%3E%3C/svg%3E%3Cpath%20d='M47%2018%20C36%2030%2030%2044%2028%2058%20H47%20Z'%20fill='%23f7f7f2'/%3E%3Cpath%20d='M12%2060%20H88%20C84%2074%2072%2082%2050%2082%20C28%2082%2016%2074%2012%2060%20Z'%20fill='%23044959'/%3E%3Cellipse%20cx='36'%20cy='66'%20rx='7'%20ry='3'%20fill='%23fff'%20opacity='.18'/%3E%3Ccircle%20cx='42.35'%20cy='69'%20r='2.8899999999999997'%20fill='%23ffffff'/%3E%3Ccircle%20cx='57.65'%20cy='69'%20r='2.8899999999999997'%20fill='%23ffffff'/%3E%3Ccircle%20cx='43.2'%20cy='67.98'%20r='0.85'%20fill='%23fff'/%3E%3Ccircle%20cx='58.5'%20cy='67.98'%20r='0.85'%20fill='%23fff'/%3E%3Cpath%20d='M46.6%2074.1%20q3.4%203.4%206.8%200'%20fill='none'%20stroke='%23ffffff'%20stroke-width='1.87'%20stroke-linecap='round'/%3E%3Cellipse%20cx='37.25'%20cy='73.25'%20rx='3.4'%20ry='2.04'%20fill='%23e88a8a'%20opacity='.8'/%3E%3Cellipse%20cx='62.75'%20cy='73.25'%20rx='3.4'%20ry='2.04'%20fill='%23e88a8a'%20opacity='.8'/%3E%3Cpath%20d='M6%2086%20q7%20-5%2014%200%20t14%200%20t14%200%20t14%200%20t14%200%20t14%200'%20fill='none'%20stroke='%2391cfc7'%20stroke-width='3'%20stroke-linecap='round'/%3E%3C/svg%3E" alt=""><div><div class="t">THE BOAT · CARRIES THE CREW</div><h3>Helm</h3></div><p>NinjaTrader add-on where every crew member's work lands: strategies set once per account, a daily loss limit that closes the trade, and no opposite positions.</p><div class="need"><b>Needs:</b> NinjaTrader 8 only</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="learn" class="pad">
+  <div class="in course">
+    <div><h2 class="title">How we sail it</h2><p class="intro" style="margin:0">The method behind the desk, the mistakes we made (plenty) and the checks that now catch them. Maybe a course one day; for now, it's our playbook.</p></div>
+    <ol>
+      <li>Testing an idea without fooling yourself</li>
+      <li>Red-teaming your own results</li>
+      <li>Building it in NinjaTrader 8, safely</li>
+      <li>Matching live trades to the backtest</li>
+      <li>Loss limits that really stop you</li>
+      <li>Running prop and funded accounts</li>
+      <li>Your agent team and dashboard</li>
+    </ol>
+  </div>
+</section>
+
+<section id="waitlist" class="wl">
+  <div class="in">
+    <div><h2>Curious? Leave your email</h2>
+    <p class="note" style="margin:6px 0 0">Nothing to buy. If we ever share the playbook, you'll hear first. No spam: we're too busy arguing with backtests.</p></div>
+    <form id="wlForm"><label class="sr" for="wl-email">Email</label><input id="wl-email" type="email" placeholder="you@example.com" required><button type="submit">Notify me</button></form>
+    <p class="note" id="wlNote" aria-live="polite"></p>
+  </div>
+</section>
+
+<footer>
+  <div class="in"><p>Trading futures, forex and other leveraged products involves substantial risk of loss and is not suitable for everyone. Hypothetical or simulated performance results have certain limitations; unlike an actual performance record, simulated results do not represent actual trading. Past results do not guarantee future results. TRADAL does not offer investment advice, signals or account management, and nothing on this page is for sale. © 2026 TRADAL</p></div>
+</footer>
+</div>
+
+<script>
+(function(){
+  var site=document.getElementById('site'), btn=document.getElementById('modeBtn');
+  function apply(m){
+    site.setAttribute('data-mode',m);
+    document.body.style.background = m==='dark' ? '#031c22' : '#ffffff';
+    btn.setAttribute('aria-pressed', m==='dark');
+    btn.setAttribute('aria-label', m==='dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+  var saved=null; try{ saved=localStorage.getItem('tradal-mode'); }catch(e){}
+  apply(saved==='dark' ? 'dark' : 'light');
+  btn.addEventListener('click',function(){
+    var m=site.getAttribute('data-mode')==='dark' ? 'light' : 'dark';
+    apply(m); try{ localStorage.setItem('tradal-mode',m); }catch(e){}
+  });
+  document.getElementById('wlForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    document.getElementById('wlNote').textContent='Draft only: sign-ups will be saved once the site is live.';
+  });
+})();
+</script>
+
+</body></html>
