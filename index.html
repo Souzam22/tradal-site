@@ -211,6 +211,13 @@ footer p{margin:0;max-width:none}
 .pf-sec:has(+ .pf-post){border-bottom:0} .pf-post{padding:12px 20px 16px;margin-top:auto;border-top:1px solid var(--soft)} .pf-post small{color:var(--muted);font-size:12px} .pf-post p{margin:4px 0 0;font-size:14px;font-style:italic;color:var(--ink)}
 @media (max-width:980px){.team .pf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:620px){.team .pf-grid{grid-template-columns:1fr}}
+/* What never changes as cards (21 Nov) */
+.three .nv{position:relative;overflow:hidden;border:0;border-radius:16px;padding:26px 26px 28px;color:#fff;min-height:190px;display:flex;flex-direction:column;box-shadow:0 10px 30px -18px rgba(2,44,54,.55);transition:transform .2s}
+.three .nv:hover{transform:translateY(-3px)}
+.three .nv.n1{background:linear-gradient(135deg,#1f7c80,#044959)} .three .nv.n2{background:linear-gradient(135deg,#044959,#022c36)} .three .nv.n3{background:linear-gradient(135deg,#2b8f87,#1f7c80)}
+.three .nv h3{color:#fff;font-size:22px;margin:auto 0 8px} .three .nv p{color:#d6f0ed;font-size:16px}
+.nv-n{font:600 13px var(--f-mono,monospace);letter-spacing:.08em;color:#9fe0d8;margin-bottom:28px}
+.nv-ic{position:absolute;right:18px;top:14px;font-size:54px;opacity:.18;filter:grayscale(1) brightness(3)}
 </style>
 </head>
 <body>
@@ -303,9 +310,9 @@ footer p{margin:0;max-width:none}
   <div class="in">
     <h2 class="title" style="margin-bottom:28px">What never changes</h2>
     <div class="three">
-      <div><h3>Loss limits act on their own</h3><p>At the limit, positions close and the day ends.</p></div>
-      <div><h3>Drawdown first</h3><p>Profit is always judged against the worst drawdown in dollars.</p></div>
-      <div><h3>Simple wins ties</h3><p>Between two similar results, fewer rules stay.</p></div>
+      <div class="nv n1"><span class="nv-ic" aria-hidden="true">⚓</span><span class="nv-n">01</span><h3>Loss limits act on their own</h3><p>At the limit, positions close and the day ends.</p></div>
+      <div class="nv n2"><span class="nv-ic" aria-hidden="true">↘</span><span class="nv-n">02</span><h3>Drawdown first</h3><p>Profit is always judged against the worst drawdown in dollars.</p></div>
+      <div class="nv n3"><span class="nv-ic" aria-hidden="true">⛵</span><span class="nv-n">03</span><h3>Simple wins ties</h3><p>Between two similar results, fewer rules stay.</p></div>
     </div>
   </div>
 </section>
