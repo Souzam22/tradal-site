@@ -65,7 +65,7 @@ nav .in{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding-blo
 @media (max-width:560px){.links .btn:not(.login){display:none}}
 
 /* hero */
-.hero{text-align:center;padding-block:clamp(48px,8vw,104px)}
+.hero{text-align:center;padding-block:clamp(56px,8vw,96px) 0}   /* one gap under the hero, the same as between sections (Helm 22 Nov: "all same") */
 .hero h1{font-size:clamp(38px,6vw,78px);line-height:1.03;margin:18px auto 20px;max-width:18ch;color:var(--brand)}
 .hero p{font-size:19px;color:var(--muted);margin:0 auto 28px;max-width:56ch}
 .cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
@@ -142,7 +142,7 @@ section h2.title{font-size:clamp(28px,3.6vw,44px);margin:0 0 10px;color:var(--br
 @media (max-width:560px){.crew,.bundles{grid-template-columns:1fr}}
 
 /* course */
-.course{display:grid;grid-template-columns:1fr 1fr;gap:24px 56px;align-items:start}
+.course{display:grid;grid-template-columns:1fr 1fr;gap:24px 56px;align-items:center}
 .course ol{margin:0;padding:6px 22px;list-style:none;counter-reset:pl;background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 10px 26px rgba(7,42,77,.06)}
 .course ol li{counter-increment:pl;display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);color:var(--ink);line-height:1.35}
 .course ol li:last-child{border-bottom:0}
@@ -317,7 +317,7 @@ h1,h2,h3{font-weight:300;letter-spacing:-.02em} h1 em{font-family:var(--f-serif)
     </div>
     <p class="intro" style="margin:14px 0 0;font-size:14px">Simulated accounts on live market data, 1 contract, after costs. Two days is far too little to judge anything: this shelf is here so you can watch the record grow, bad days included. Simulated results are not real trading and do not predict future results.</p>
     </div>
-    <p class="intro">The strategies we run, each tested on real market data before it was allowed to trade: the trading platform for futures, real option quotes for spreads. Live results join this shelf once there are enough of them to mean something.</p>
+    <p class="intro">The strategies we run, each tested on real market data before it was allowed to trade: the trading platform for futures, real option quotes for options. Live results join this shelf once there are enough of them to mean something.</p>
     <p class="tide">Every tide has a pattern. Years of backtests show ours.</p>
 
     <div class="bt-head" style="margin-top:28px"><h3>Futures · backtested over 5 years</h3><span>PLATFORM BACKTEST · MNQ · JUN 2021 – NOV 2026 · 1 CONTRACT · AFTER $2 A TRADE</span></div>
@@ -327,14 +327,14 @@ h1,h2,h3{font-weight:300;letter-spacing:-.02em} h1 em{font-family:var(--f-serif)
       <div class="bt"><span class="tag">TOP C · 5-YEAR BACKTEST</span><h4>Strategy C</h4><div class="ratio">11.7<small>net / max drawdown</small></div><div class="bh">6.4× buy and hold</div><dl><dt>Net</dt><dd>+$21,535</dd><dt>Max drawdown</dt><dd>−$1,836</dd><dt>Trades</dt><dd>488</dd><dt>Positive years</dt><dd>5 of 6</dd></dl><div class="foot">One off year. Nobody's perfect.</div></div>
       <div class="bt port"><span class="tag">PORTFOLIO · 5-YEAR BACKTEST</span><h4>A + B + C</h4><div class="ratio">24.9<small>net / max drawdown</small></div><div class="bh">13.5× buy and hold</div><dl><dt>Net</dt><dd>+$85,464</dd><dt>Max drawdown</dt><dd>−$3,430</dd><dt>Trades</dt><dd>3,744</dd><dt>Positive years</dt><dd>6 of 6</dd></dl><div class="foot">All three together, 1 contract each · drawdown on daily totals</div></div>
     </div>
-    <div class="bt-head" style="margin-top:36px"><h3>Spreads · backtested over 4 years</h3><span>SPX SAME-DAY SPREADS · REAL OPTION QUOTES · MAY 2022 – MAY 2026 · 1 SPREAD · NATURAL FILLS</span></div>
+    <div class="bt-head" style="margin-top:36px"><h3>Options · backtested over 4 years</h3><span>SPX SAME-DAY OPTIONS · REAL OPTION QUOTES · MAY 2022 – MAY 2026 · 1 POSITION · NATURAL FILLS</span></div>
     <div class="bts">
-      <div class="bt"><span class="tag">TOP A · 4-YEAR BACKTEST</span><h4>Spread A</h4><div class="ratio">10.4<small>net / max drawdown</small></div><div class="bh">4.5× buy and hold</div><dl><dt>Net</dt><dd>+$25,262</dd><dt>Max drawdown</dt><dd>−$2,432</dd><dt>Trades</dt><dd>335</dd><dt>Full years up</dt><dd>3 of 3</dd></dl><div class="foot">Wins small, wins often. Starts paper on Monday.</div></div>
-      <div class="bt"><span class="tag">TOP B · 4-YEAR BACKTEST</span><h4>Spread B</h4><div class="ratio">7.5<small>net / max drawdown</small></div><div class="bh">3.3× buy and hold</div><dl><dt>Net</dt><dd>+$47,777</dd><dt>Max drawdown</dt><dd>−$6,343</dd><dt>Trades</dt><dd>956</dd><dt>Full years up</dt><dd>3 of 3</dd></dl><div class="foot">An afternoon butterfly. Patient by design.</div></div>
-      <div class="bt"><span class="tag">TOP C · 4-YEAR BACKTEST</span><h4>Spread C</h4><div class="ratio">5.6<small>net / max drawdown</small></div><div class="bh">2.4× buy and hold</div><dl><dt>Net</dt><dd>+$52,902</dd><dt>Max drawdown</dt><dd>−$9,468</dd><dt>Trades</dt><dd>984</dd><dt>Full years up</dt><dd>3 of 3</dd></dl><div class="foot">Earns the most, swings the most.</div></div>
-      <div class="bt port"><span class="tag">CASH BOOK · 4-YEAR BACKTEST</span><h4>The spread book</h4><div class="ratio">24.7<small>net / max drawdown</small></div><div class="bh">10.7× buy and hold</div><dl><dt>Net</dt><dd>+$188,181</dd><dt>Max drawdown</dt><dd>−$7,610</dd><dt>Spreads</dt><dd>4</dd><dt>Runs on</dt><dd>paper</dd></dl><div class="foot">Four spreads together, 1 each · drawdown on daily marked totals</div></div>
+      <div class="bt"><span class="tag">TOP A · 4-YEAR BACKTEST</span><h4>Options A</h4><div class="ratio">10.4<small>net / max drawdown</small></div><div class="bh">4.5× buy and hold</div><dl><dt>Net</dt><dd>+$25,262</dd><dt>Max drawdown</dt><dd>−$2,432</dd><dt>Trades</dt><dd>335</dd><dt>Full years up</dt><dd>3 of 3</dd></dl><div class="foot">Wins small, wins often. Starts paper on Monday.</div></div>
+      <div class="bt"><span class="tag">TOP B · 4-YEAR BACKTEST</span><h4>Options B</h4><div class="ratio">7.5<small>net / max drawdown</small></div><div class="bh">3.3× buy and hold</div><dl><dt>Net</dt><dd>+$47,777</dd><dt>Max drawdown</dt><dd>−$6,343</dd><dt>Trades</dt><dd>956</dd><dt>Full years up</dt><dd>3 of 3</dd></dl><div class="foot">An afternoon butterfly. Patient by design.</div></div>
+      <div class="bt"><span class="tag">TOP C · 4-YEAR BACKTEST</span><h4>Options C</h4><div class="ratio">5.6<small>net / max drawdown</small></div><div class="bh">2.4× buy and hold</div><dl><dt>Net</dt><dd>+$52,902</dd><dt>Max drawdown</dt><dd>−$9,468</dd><dt>Trades</dt><dd>984</dd><dt>Full years up</dt><dd>3 of 3</dd></dl><div class="foot">Earns the most, swings the most.</div></div>
+      <div class="bt port"><span class="tag">PORTFOLIO · 4-YEAR BACKTEST</span><h4>Options portfolio</h4><div class="ratio">24.7<small>net / max drawdown</small></div><div class="bh">10.7× buy and hold</div><dl><dt>Net</dt><dd>+$188,181</dd><dt>Max drawdown</dt><dd>−$7,610</dd><dt>Strategies</dt><dd>4 of ours</dd><dt>Runs on</dt><dd>paper</dd></dl><div class="foot">Four of our options strategies together, 1 each · drawdown on daily marked totals</div></div>
     </div>
-    <p class="intro" style="margin:14px 0 0;font-size:14px">Backtests are hypothetical and were run on data that also helped choose the settings. They show how each strategy behaved in the past, not what it will do. Live trading is the real test, and those results will be shown here once there are enough of them. Backtest and live rankings are kept separately, so Strategy A is not necessarily Strategy 1. “Buy and hold” is holding the market itself over the same years: it scores 1.84 for the futures window and 2.31 for the spreads window.</p>
+    <p class="intro" style="margin:14px 0 0;font-size:14px">Backtests are hypothetical and were run on data that also helped choose the settings. They show how each strategy behaved in the past, not what it will do. Live trading is the real test, and those results will be shown here once there are enough of them. Backtest and live rankings are kept separately, so Strategy A is not necessarily Strategy 1. “Buy and hold” is holding the market itself over the same years: it scores 1.84 for the futures window and 2.31 for the options window.</p>
   </div>
 </section>
 
