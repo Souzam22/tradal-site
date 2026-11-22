@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>TRADAL</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TRADAL">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#06252b">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;background:linear-gradient(#0a5563,#06252b);color:#fff;font:16px/1.4 -apple-system,Segoe UI,Helvetica,Arial,sans-serif;text-align:center;padding:2rem;box-sizing:border-box}
+img{width:120px;height:120px;border-radius:26px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+a.go{display:inline-block;background:#fff;color:#06252b;font-weight:700;padding:.85rem 1.6rem;border-radius:99px;text-decoration:none}
+small{opacity:.8;max-width:22rem}
+</style></head><body>
+<img src="icon-512.png" alt="TRADAL">
+<a class="go" id="go" href="https://claude.ai/artifact/XrisBdXrrfQnLeHCW6YnS2">Open Lighthouse</a>
+<small id="tip">To keep it on your phone: tap Share, then <b>Add to Home Screen</b>. The TRADAL icon opens Lighthouse straight away.</small>
+<script>
+var L='https://claude.ai/artifact/XrisBdXrrfQnLeHCW6YnS2';
+var home=window.navigator.standalone===true||matchMedia('(display-mode: standalone)').matches||/[?&]launch=1/.test(location.search);
+if(home){document.getElementById('tip').textContent='Opening Lighthouse…';location.replace(L);}
+</script>
+</body></html>
