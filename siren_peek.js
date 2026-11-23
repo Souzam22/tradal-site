@@ -9,6 +9,8 @@
   var LINES = ["I saw that.", "Don't mind me. Just reading your logs.", "I'm not here. Keep working.", "Upside down is my good side.",
     "Every number tells a story. I check which ones are fiction.", "Relax. If it were bad, you'd hear me sing.", "Wrong corner? There's no wrong corner.",
     "I was never here.", "Not sure I fit in with the Tradals. Doesn't matter. Back to work.", "Sirens sing you onto the rocks. I point at them. You're welcome."];
+  var HOVER = ["I don't need a profile. Or an invite.", "No profile, no invite. Still here.", "Not on the crew list. Never asked to be.",
+    "You didn't invite me. I let myself in.", "A badge? Please. I'm the one checking yours.", "I'm not part of the crew. I just make sure the crew works."];
   var CORNERS = { tl: { a: 150, v: "top", h: "left" }, tr: { a: -150, v: "top", h: "right" }, bl: { a: 28, v: "bottom", h: "left" }, br: { a: -28, v: "bottom", h: "right" } };
   var css = ".siren-peek{position:fixed;z-index:2147483000;width:66px;height:66px;padding:0;border:0;background:none;cursor:pointer;transition:transform .5s cubic-bezier(.3,1.4,.5,1),opacity .35s;opacity:.97}"
     + ".siren-peek svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 2px 4px rgba(7,42,77,.28))}"
@@ -32,6 +34,14 @@
     var d = Math.sqrt(lx * lx + ly * ly) || 1, ex = 40 + 11 * (lx / d), ey = 47.5 + 1.2 * (ly / d);
     eye.setAttribute("x", Math.max(29, Math.min(51, ex)).toFixed(1)); eye.setAttribute("y", Math.max(46.3, Math.min(48.7, ey)).toFixed(1));
   }
+  var busy = false;
+  function say(text, sign) {   // the bubble sits beside her, on the page side of her corner
+    var b = el.getBoundingClientRect(); bub.textContent = text + " ";
+    if (sign) { var sig = document.createElement("b"); sig.textContent = "— S."; bub.appendChild(sig); }
+    var right = cur && cur.h === "right", top = cur && cur.v === "top";
+    var x = right ? b.left - 252 : b.right + 10, y = top ? b.bottom - 6 : b.top + 6;
+    bub.style.left = Math.min(Math.max(8, x), window.innerWidth - 256) + "px"; bub.style.top = Math.min(Math.max(8, y), window.innerHeight - 60) + "px"; bub.style.opacity = "1";
+  }
   function start() {
     var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
     el = document.createElement("button"); el.type = "button"; el.className = "siren-peek"; el.setAttribute("aria-label", "Siren is watching"); el.title = "Siren";
@@ -40,14 +50,11 @@
     document.body.appendChild(el); document.body.appendChild(bub); place();
     setTimeout(function () { look(window.innerWidth / 2, window.innerHeight / 2); }, 50);   // until the pointer moves, she watches the middle of the page
     document.addEventListener("pointermove", function (e) { look(e.clientX, e.clientY); }, { passive: true });
-    el.addEventListener("mouseenter", function () { el.style.transform = el.dataset.out; });
-    el.addEventListener("mouseleave", function () { el.style.transform = el.dataset.rest; });
+    el.addEventListener("mouseenter", function () { el.style.transform = el.dataset.out; if (!busy) say(pick(HOVER), false); });   // Helm 23 Nov: pass the mouse over her
+    el.addEventListener("mouseleave", function () { el.style.transform = el.dataset.rest; if (!busy) bub.style.opacity = "0"; });
     el.addEventListener("click", function () {
-      var b = el.getBoundingClientRect(); bub.textContent = pick(LINES) + " ";
-      var sig = document.createElement("b"); sig.textContent = "\u2014 S."; bub.appendChild(sig);
-      var x = Math.min(Math.max(8, b.left + b.width / 2 - 120), window.innerWidth - 256), y = b.top > window.innerHeight / 2 ? b.top - 66 : b.bottom + 10;
-      bub.style.left = x + "px"; bub.style.top = Math.max(8, y) + "px"; bub.style.opacity = "1";
-      setTimeout(function () { bub.style.opacity = "0"; el.style.opacity = "0";
+      busy = true; say(pick(LINES), true);
+      setTimeout(function () { busy = false; bub.style.opacity = "0"; el.style.opacity = "0";
         setTimeout(function () { place(); el.style.opacity = ".97"; look(window.innerWidth / 2, window.innerHeight / 2); }, 900 + Math.random() * 2500); }, 2600);
     });
   }
