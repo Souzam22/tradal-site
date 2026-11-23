@@ -22,7 +22,7 @@
     "When are you joining the 5% that actually make money?", "Good luck today. You'll need it. The market is crazy.",
     "Really? You still trade manually?", "Clicking buy and sell by hand? Brave. Very brave.", "We'd let you in, but the bots are picky.",
     "Still staring at charts all day? Cute.", "Sorry, the crew works for one client. It isn't you.", "Waitlist? There's no waitlist. Just envy.",
-    "Your stop-loss called. It misses you."];
+    "Your stop-loss called. It misses you.", "Imagine having to place your own orders."];
   var L = {
     hover: PRIV ? ["No profile, no invite. I still see more than your dashboard.", "Aww, you found me. Took you longer than the last bug.",
         "Smile. Somewhere a backtest is lying to you.", "Cute, right? So was your last 'quick fix'.", "I'm not on the team page. I'm the reason it's accurate."]
