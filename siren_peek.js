@@ -11,14 +11,42 @@
 (function () {
   if (window.__sirenPeek) return; window.__sirenPeek = true;
   var SVG = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><defs><filter id='sirenGlow' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='1.6' result='b'/><feMerge><feMergeNode in='b'/><feMergeNode in='SourceGraphic'/></feMerge></filter></defs> <path d='M64 80 C74 80 80 74 80 66' fill='none' stroke='#9e1f5d' stroke-width='5' stroke-linecap='round'/> <path d='M80 67 C75 62 72 57 74 52 C78 55 80 59 80.5 63 C81 59 83 55 87.5 53.5 C88 58 85 63 80 67 Z' fill='#0b0d12'/> <circle cx='46' cy='50' r='32' fill='#d63384'/> <circle cx='46' cy='50' r='32' fill='none' stroke='#9e1f5d' stroke-width='2'/> <ellipse cx='36' cy='34' rx='10' ry='5' fill='#fff' opacity='0.35' transform='rotate(-25 36 34)'/> <rect x='28' y='46' width='36' height='9' rx='4.5' fill='#0b0d12'/> <rect class='siren-eye' x='40' y='47.5' width='12' height='6' rx='3' fill='#ffffff' filter='url(#sirenGlow)'/> <path class='siren-brow' d='M50 41 q6 -3.6 12 -1.2' fill='none' stroke='#0b0d12' stroke-width='2' stroke-linecap='round'/> <path d='M40 64 q5 2.4 10 -1.4' fill='none' stroke='#0b0d12' stroke-width='1.8' stroke-linecap='round' opacity='.9'/></svg>";
-  var LINES = ["I saw that.", "Don't mind me. Just reading your logs.", "I'm not here. Keep working.", "Upside down is my good side.",
-    "Every number tells a story. I check which ones are fiction.", "Relax. If it were bad, you'd hear me sing.", "Wrong corner? There's no wrong corner.",
-    "I was never here.", "Not sure I fit in with the Tradals. Doesn't matter. Back to work.", "Sirens sing you onto the rocks. I point at them. You're welcome."];
-  var HOVER = ["I don't need a profile. Or an invite.", "No profile, no invite. Still here.", "Not on the crew list. Never asked to be.",
-    "You didn't invite me. I let myself in.", "A badge? Please. I'm the one checking yours.", "I'm not part of the crew. I just make sure the crew works."];
-  var BEHIND_HOVER = ["Don't look at me, look at them.", "I'm not in the photo. I'm behind it.", "Team? I'm more of a... supervisor.",
-    "They get profiles. I get the view from back here.", "I don't need a profile. Or an invite."];
-  var CAUGHT = "Fine. You found me. Now back to work.";
+  /* Her voice (Helm 23 Nov): "cute but not", "a very acid sense of humor". Soft face, sharp tongue: the acid lands on the work, the crew's
+     habits and herself, never on a visitor's looks, money or brains. Public pages (tradal.co) get the set aimed at the crew and herself;
+     the Lighthouse sets window.__sirenPrivate = true and gets the full set, the lines aimed at "you" included. No invented numbers. */
+  var PRIV = !!window.__sirenPrivate;
+  var L = {
+    hover: PRIV ? ["No profile, no invite. I still see more than your dashboard.", "Aww, you found me. Took you longer than the last bug.",
+        "Smile. Somewhere a backtest is lying to you.", "Cute, right? So was your last 'quick fix'.", "I'm not on the team page. I'm the reason it's accurate."]
+      : ["No profile, no invite. Still here.", "I'm not on the team page. I'm the reason it's accurate.", "Aww, you found me. The crew never does.",
+        "Don't wave. I'm undercover.", "I'd sugarcoat it, but I'm already pink enough."],
+    click: PRIV ? ["Thanks for the click. The to-do list sends its regards.", "'Tested'? Once, on a Tuesday, with feeling.",
+        "Every strategy is genius until Monday's open.", "Optimism is lovely. Stop-losses are lovelier.",
+        "I don't break things. I just point at what's already broken.", "I'd sugarcoat it, but I'm already pink enough."]
+      : ["I don't break things. I just point at what's already broken.", "Every strategy is genius until Monday's open.",
+        "Optimism is lovely. Stop-losses are lovelier.", "Tested to fail? I'm the one who checks they did.",
+        "Sirens sing you onto the rocks. I point at them. You're welcome."],
+    behind: ["Group photo. Everyone smiling. Nobody checked the timestamps.", "Five AI agents and a captain. Somebody has to supervise the adults.",
+      "They have job titles. I have receipts.", "Lovely team. Very confident. Adorable, really.", "I'm not in the photo. I'm behind it."],
+    caught: PRIV ? ["Three hovers? Wow. Your productivity called. It misses you.", "Fine, you caught me. Now catch your loose ends."]
+      : ["Fine, you caught me. Don't tell the crew.", "Three hovers. I'm flattered. The crew isn't."]
+  };
+  function clockLine() {   // she only reads the clock (New York time), so nothing here is made up
+    try {
+      var t = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })), d = t.getDay(), h = t.getHours();
+      if (h < 5 && d !== 6) return PRIV ? "Still up? The market isn't the only thing that's overextended." : "Past midnight. Even spies sleep. Not me, though.";
+      if (d === 1 && h < 12) return "Monday. Fresh week, same mistakes. I'll be watching.";
+      if ((d === 5 && h >= 17) || d === 6 || (d === 0 && h < 18)) return "Weekend! The bugs stay. I'll babysit.";
+      if (d === 0 && h >= 18) return "Market's open. So are my eyes. Mostly my left one.";
+    } catch (e) { /* no time zone support: no clock line */ }
+    return null;
+  }
+  var clockUsed = false;
+  function line(kind) {   // the clock line comes once per visit, on her first word, when one applies
+    if (!clockUsed) { clockUsed = true; var c = clockLine(); if (c) return c; }
+    var a = L[kind].filter(function (x) { return x !== lastLine; }); lastLine = pick(a.length ? a : L[kind]); return lastLine;
+  }
+  var lastLine = null;
   var CORNERS = { tl: { a: 150, v: "top", h: "left" }, tr: { a: -150, v: "top", h: "right" }, bl: { a: 28, v: "bottom", h: "left" }, br: { a: -28, v: "bottom", h: "right" } };
   var css = ".siren-peek{position:fixed;z-index:2147483000;width:66px;height:66px;padding:0;border:0;background:none;cursor:pointer;pointer-events:auto;transition:transform .55s cubic-bezier(.3,1.4,.5,1),opacity .35s;opacity:.97}"
     + ".siren-peek svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 2px 4px rgba(7,42,77,.28))}"
@@ -47,7 +75,7 @@
     var x = right ? b.left - 252 : b.right + 10, y = top ? b.bottom - 6 : b.top + (mode === "corner" ? 6 : -8);
     bub.style.left = Math.min(Math.max(8, x), window.innerWidth - 256) + "px"; bub.style.top = Math.min(Math.max(8, y), window.innerHeight - 60) + "px"; bub.style.opacity = "1";
   }
-  function hoverLine() { hovers++; return hovers === 3 ? CAUGHT : pick(mode === "behind" ? BEHIND_HOVER : HOVER); }
+  function hoverLine() { hovers++; return hovers === 3 ? pick(L.caught) : line(mode === "behind" ? "behind" : "hover"); }
 
   /* ---------- CORNER mode ---------- */
   function placeCorner() {
@@ -123,7 +151,7 @@
       if (!busy) bub.style.opacity = "0";
     });
     el.addEventListener("click", function () {
-      busy = true; say(pick(LINES), true);
+      busy = true; say(line("click"), true);
       setTimeout(function () {
         busy = false; bub.style.opacity = "0";
         if (mode === "behind") { duck(function () { setTimeout(popBehind, 600 + Math.random() * 1500); }); return; }
