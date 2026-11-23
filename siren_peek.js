@@ -28,6 +28,14 @@
         "Sirens sing you onto the rocks. I point at them. You're welcome."],
     behind: ["Group photo. Everyone smiling. Nobody checked the timestamps.", "Five AI agents and a captain. Somebody has to supervise the adults.",
       "They have job titles. I have receipts.", "Lovely team. Very confident. Adorable, really.", "I'm not in the photo. I'm behind it."],
+    profile: ["Nice profile. I don't need one. Everyone already knows I'm watching.", "Introductions are for people who can be found.",
+      "Profiles are cute. Mine is classified.", "Endorsements by the crew, about the crew. Adorable.", "I skipped the profile. Mystery photographs better.",
+      "Don't introduce me. It ruins the effect.", "They get a bio. I get the backstage pass.", "No endorsements needed. My notes speak for themselves."]
+      .concat(PRIV ? ["LinkedT? I'm not linked. I'm everywhere.", "Skills: finding your mistakes. Endorsed by your mistakes."] : []),
+    chat: ["Why do you talk that much? Go back to work.", "Really, nobody cares. The market certainly doesn't.",
+      "Another post? The P&L didn't ask for an update.", "Typing... still typing... the trades aren't placing themselves.",
+      "Less posting, more testing.", "Comment section open. Productivity closed.", "If talking made money, you'd be retired by now.",
+      "Hold on, let me pretend to read that. Done. Back to work.", "Write less. Backtest more.", "Lovely essay. The bots won't read it either."],
     caught: PRIV ? ["Three hovers? Wow. Your productivity called. It misses you.", "Fine, you caught me. Now catch your loose ends."]
       : ["Fine, you caught me. Don't tell the crew.", "Three hovers. I'm flattered. The crew isn't."]
   };
@@ -43,7 +51,7 @@
   }
   var clockUsed = false;
   function line(kind) {   // the clock line comes once per visit, on her first word, when one applies
-    if (!clockUsed) { clockUsed = true; var c = clockLine(); if (c) return c; }
+    if (!clockUsed && kind !== "profile" && kind !== "chat") { clockUsed = true; var c = clockLine(); if (c) return c; }
     var a = L[kind].filter(function (x) { return x !== lastLine; }); lastLine = pick(a.length ? a : L[kind]); return lastLine;
   }
   var lastLine = null;
@@ -88,11 +96,11 @@
   /* ---------- BEHIND mode: from behind the team heading's letters or a team card ---------- */
   function setT(y) { el.style.transform = "translateY(" + y + "px) rotate(" + cur.a + "deg)"; }
   function duck(then) { if (!cur) { if (then) then(); return; } setT(8); setTimeout(function () { if (then) then(); }, 520); }
-  function popBehind() {
+  function popBehind(forced) {
     if (!visible) return;
     var choices = hosts.filter(function (h) { return h !== lastHost && h.getBoundingClientRect().width > 80; });
     if (!choices.length) choices = hosts;
-    var h = pick(choices); lastHost = h; host = h;
+    var h = forced || pick(choices); lastHost = h; host = h;
     if (wrap && wrap.parentNode) wrap.parentNode.removeChild(wrap);
     wrap = document.createElement("span"); wrap.className = "siren-wrap";
     var tilt = (Math.random() < .5 ? -1 : 1) * (6 + Math.random() * 14); cur = { a: tilt };
@@ -142,6 +150,54 @@
       setTimeout(function () { look(window.innerWidth / 2, window.innerHeight / 2); }, 50);
     }
     document.addEventListener("pointermove", function (e) { look(e.clientX, e.clientY); }, { passive: true });
+    // Crew profiles (Helm 23 Nov: "on the Crew profile ... she does not need a profile or to be introduced"): when someone opens a crew
+    // member's profile, she turns up and makes a joke about not needing one. tradal.co: data-siren-profiles on the heading (the team cards);
+    // Lighthouse: window.__sirenProfiles (the Crew page cards and the LinkedT profile pop-up).
+    var profSel = (head && head.getAttribute("data-siren-profiles")) || window.__sirenProfiles || "", lastReact = 0, hoverT = null, hoverEl = null;
+    function react(card) {
+      if (busy || Date.now() - lastReact < 7000) return; lastReact = Date.now();
+      var text = line("profile");
+      if (mode === "behind" && visible && card && hosts.indexOf(card) >= 0) {
+        clearTimeout(timer); duck(function () { popBehind(card); setTimeout(function () { say(text, false); setTimeout(function () { if (!busy) bub.style.opacity = "0"; }, 3800); }, 650); });
+      } else if (el.isConnected) {
+        if (mode === "corner") el.style.transform = el.dataset.out;
+        say(text, false);
+        setTimeout(function () { if (!busy) { bub.style.opacity = "0"; if (mode === "corner") el.style.transform = el.dataset.rest; } }, 3800);
+      }
+    }
+    if (profSel) {
+      document.addEventListener("mouseover", function (e) {
+        var c = e.target && e.target.closest ? e.target.closest(profSel) : null;
+        if (c === hoverEl) return; hoverEl = c; clearTimeout(hoverT);
+        if (c) hoverT = setTimeout(function () { if (hoverEl === c) react(c); }, 650);
+      }, { passive: true });
+      document.addEventListener("focusin", function (e) { var c = e.target && e.target.closest ? e.target.closest(profSel) : null; if (c) react(c); });
+    }
+    // The crew chat (Helm 23 Nov: "close to the chat, make jokes of why do you talk that much, go back to work. Really nobody cares"):
+    // when someone types in the Lighthouse feed or crew notes (window.__sirenChat), she jumps to the edge of that box and heckles.
+    var chatSel = window.__sirenChat || "", chatLast = 0, typeT = null;
+    function chatReact(f) {
+      if (busy || mode !== "corner" || Date.now() - chatLast < 9000 || !el.isConnected) return; chatLast = Date.now();
+      var r = f.getBoundingClientRect(), st = el.style, keep = { top: st.top, bottom: st.bottom, left: st.left, right: st.right, t: st.transform, c: cur };
+      st.bottom = st.right = ""; st.top = Math.max(4, r.top - 46) + "px"; st.left = Math.max(4, Math.min(window.innerWidth - 74, r.right - 52)) + "px";
+      cur = { a: 16, h: r.right > window.innerWidth - 300 ? "right" : "left" }; st.transform = "rotate(16deg)";
+      say(line("chat"), false);
+      setTimeout(function () { if (busy) return; bub.style.opacity = "0"; st.top = keep.top; st.bottom = keep.bottom; st.left = keep.left; st.right = keep.right; st.transform = keep.t; cur = keep.c; }, 4500);
+    }
+    if (chatSel) {
+      document.addEventListener("input", function (e) {
+        var f = e.target && e.target.matches && e.target.matches(chatSel) ? e.target : null; if (!f) return;
+        clearTimeout(typeT); typeT = setTimeout(function () { chatReact(f); }, 1300);
+      });
+    }
+    if (window.__sirenProfilePop && "MutationObserver" in window) {   // the Lighthouse's LinkedT profile pop-up
+      new MutationObserver(function (ms) {
+        for (var i = 0; i < ms.length; i++) for (var j = 0; j < ms[i].addedNodes.length; j++) {
+          var n = ms[i].addedNodes[j];
+          if (n.nodeType === 1 && (n.matches && n.matches(window.__sirenProfilePop) || n.querySelector && n.querySelector(window.__sirenProfilePop))) { lastReact = 0; react(null); return; }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    }
     el.addEventListener("mouseenter", function () {
       if (mode === "corner") el.style.transform = el.dataset.out; else setT(-56);
       if (!busy) say(hoverLine(), false);
