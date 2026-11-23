@@ -22,7 +22,10 @@
     "When are you joining the 5% that actually make money?", "Good luck today. You'll need it. The market is crazy.",
     "Really? You still trade manually?", "Clicking buy and sell by hand? Brave. Very brave.", "We'd let you in, but the bots are picky.",
     "Still staring at charts all day? Cute.", "Sorry, the crew works for one client. It isn't you.", "Waitlist? There's no waitlist. Just envy.",
-    "Your stop-loss called. It misses you.", "Imagine having to place your own orders.", "How can someone stay so long in front of a screen?"];
+    "Your stop-loss called. It misses you.", "Imagine having to place your own orders.", "How can someone stay so long in front of a screen?",
+    "If you need to talk to someone, leave a message. They're enjoying life."];
+  var CONTACT = ["If you need to talk to someone, leave a message. They're enjoying life.", "Message them? They're busy. Trading. Without you.",
+    "Connect? Cute. They don't network. They backtest.", "Contact info? You're looking at it. Pink, round, unimpressed."];
   var SCREEN = ["How can someone stay so long in front of a screen?", "Still here? Blink. Stretch. Then back to work.",
     "That's a long time to stare at a screen. Even for me."];
   var L = {
@@ -40,6 +43,7 @@
       "Profiles are cute. Mine is classified.", "Endorsements by the crew, about the crew. Adorable.", "I skipped the profile. Mystery photographs better.",
       "Don't introduce me. It ruins the effect.", "They get a bio. I get the backstage pass.", "No endorsements needed. My notes speak for themselves."]
       .concat(PRIV ? ["LinkedT? I'm not linked. I'm everywhere.", "Skills: finding your mistakes. Endorsed by your mistakes."] : []),
+    contact: CONTACT,
     chat: ["Why do you talk that much? Go back to work.", "Really, nobody cares. The market certainly doesn't.",
       "Another post? The P&L didn't ask for an update.", "Typing... still typing... the trades aren't placing themselves.",
       "Less posting, more testing.", "Comment section open. Productivity closed.", "If talking made money, you'd be retired by now.",
@@ -61,7 +65,7 @@
   }
   var clockUsed = false;
   function line(kind) {   // the clock line comes once per visit, on her first word, when one applies
-    if (!clockUsed && kind !== "profile" && kind !== "chat") { clockUsed = true; var c = clockLine(); if (c) return c; }
+    if (!clockUsed && kind !== "profile" && kind !== "chat" && kind !== "contact") { clockUsed = true; var c = clockLine(); if (c) return c; }
     var a = L[kind].filter(function (x) { return x !== lastLine; }); lastLine = pick(a.length ? a : L[kind]); return lastLine;
   }
   var lastLine = null;
@@ -214,6 +218,21 @@
         say(text, false);
         setTimeout(function () { if (!busy) { bub.style.opacity = "0"; if (mode === "corner") el.style.transform = el.dataset.rest; } }, 3800);
       }
+    }
+    var contactSel = (head && head.getAttribute("data-siren-contact")) || window.__sirenContact || "", lastContact = 0, contactN = 0;
+    function contactReact(t) {
+      if (busy || Date.now() - lastContact < 5000) return; lastContact = Date.now(); lastReact = Date.now();
+      var text = contactN++ ? line("contact") : CONTACT[0], card = profSel && t.closest ? t.closest(profSel) : null;
+      if (mode === "behind" && visible && card && hosts.indexOf(card) >= 0 && card !== host) {
+        clearTimeout(timer); duck(function () { popBehind(card); setTimeout(function () { say(text, false); setTimeout(function () { if (!busy) bub.style.opacity = "0"; }, 4500); }, 650); });
+      } else if (el.isConnected) {
+        say(text, false); setTimeout(function () { if (!busy) bub.style.opacity = "0"; }, 4500);
+      }
+    }
+    if (contactSel) {
+      document.addEventListener("click", function (e) { var t = hit(e, contactSel); if (t) contactReact(t); }, true);
+      var cHover = null;
+      document.addEventListener("mouseover", function (e) { var t = hit(e, contactSel); clearTimeout(cHover); if (t) cHover = setTimeout(function () { contactReact(t); }, 500); }, { passive: true });
     }
     if (profSel) {
       document.addEventListener("mouseover", function (e) {
