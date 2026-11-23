@@ -12,7 +12,7 @@
    Her eyes follow the pointer in both. Hover her three times and she gives up the act. Self-contained: no libraries, no data, no network. */
 (function () {
   if (window.__sirenPeek) return; window.__sirenPeek = true;
-  var SVG = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><defs><radialGradient id='sirenShine' cx='40%' cy='60%' r='70%'><stop offset='0' stop-color='#f25ca8'/><stop offset='1' stop-color='#ec4899'/></radialGradient></defs><g transform='rotate(-24 48 58)'><path d='M48 8 C44 20 20 42 20 62 A28 28 0 0 0 76 62 C76 42 52 20 48 8 Z' fill='url(#sirenShine)'/></g><g class='siren-eyes'><g class='siren-blink'><ellipse cx='51' cy='60' rx='5' ry='8.2' fill='#fff' transform='rotate(-14 51 60)'/><ellipse cx='66' cy='56.5' rx='5' ry='8.2' fill='#fff' transform='rotate(-14 66 56.5)'/></g></g></svg>";
+  var SVG = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><defs><radialGradient id='sirenShine' cx='40%' cy='60%' r='70%'><stop offset='0' stop-color='#f25ca8'/><stop offset='1' stop-color='#ec4899'/></radialGradient></defs><g><path d='M27 14 C38 10 54 14 66 22 C80 31 85 48 81 63 C76 80 60 88 46 86 C29 84 15 71 15 55 C15 42 17 24 27 14 Z' fill='url(#sirenShine)'/></g><g class='siren-eyes'><g class='siren-blink'><ellipse cx='52' cy='41' rx='3.8' ry='6.4' fill='#fff' transform='rotate(-12 52 41)'/><ellipse cx='65' cy='39' rx='3.8' ry='6.4' fill='#fff' transform='rotate(-12 65 39)'/></g></g></svg>";
   /* Her voice (Helm 23 Nov): "cute but not", "a very acid sense of humor". Soft face, sharp tongue: the acid lands on the work, the crew's
      habits and herself, never on a visitor's looks, money or brains. Public pages (tradal.co) get the set aimed at the crew and herself;
      the Lighthouse sets window.__sirenPrivate = true and gets the full set, the lines aimed at "you" included. No invented numbers. */
@@ -78,6 +78,8 @@
   var css = ".siren-peek{position:fixed;z-index:2147483000;width:66px;height:66px;padding:0;border:0;background:none;cursor:pointer;pointer-events:auto;transition:transform .55s cubic-bezier(.3,1.4,.5,1),opacity .35s,left 1.8s cubic-bezier(.45,0,.2,1),top 1.8s cubic-bezier(.45,0,.2,1);opacity:.97}"
     + ".siren-peek svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 2px 4px rgba(7,42,77,.28))}"
     + ".siren-peek svg{animation:sirenBounce 2.8s ease-in-out infinite;transform-origin:50% 90%}"
+    + ".siren-peek.siren-still{transition:opacity .6s}.siren-peek.siren-still svg{animation:sirenTilt 12s ease-in-out infinite;transform-origin:50% 85%}"
+    + "@keyframes sirenTilt{0%,8%{transform:rotate(0)}13%,22%{transform:rotate(-14deg)}27%,31%{transform:rotate(0)}36%,45%{transform:rotate(11deg)}50%,54%{transform:rotate(0)}58%,62%{transform:rotate(-6deg) translateY(-2px)}66%,78%{transform:rotate(0)}86%{transform:rotate(360deg)}86.01%,100%{transform:rotate(0)}}"
     + "@keyframes sirenBounce{0%,100%{transform:translateY(0) scale(1.015,.985)}50%{transform:translateY(-2.5px) scale(.995,1.005)}}"
     + ".siren-peek .siren-eyes{transition:transform .22s ease-out}"
     + ".siren-peek .siren-blink{transform-box:fill-box;transform-origin:center;animation:sirenBlink 5.2s infinite}"
@@ -124,12 +126,13 @@
   /* ---------- WANDER mode (the Lighthouse, /app): she glides from spot to spot ---------- */
   var wanderT = null, hovering = false, lastX = window.innerWidth / 2, lastY = window.innerHeight / 2;
   function placeCorner() {
-    var c = pick(spots().filter(function (x) { return x.k !== last; })), s = el.style;
+    var c = STILL ? spots()[1] : pick(spots().filter(function (x) { return x.k !== last; })), s = el.style;
     last = c.k; cur = c; s.right = s.bottom = ""; s.left = c.x + "px"; s.top = c.y + "px";
     el.dataset.rest = "translate(0px,0px)"; el.dataset.out = "translate(" + c.ox + "px," + c.oy + "px)"; el.style.transform = el.dataset.rest;
   }
+  var STILL = true;   // Helm 23 Nov 11:02/11:05: "stop moving ... in a corner and turn her head", "same concept" on the web
   function wander() {
-    clearTimeout(wanderT);
+    clearTimeout(wanderT); if (STILL) return;
     wanderT = setTimeout(function () { if (!busy && !hovering) { placeCorner(); setTimeout(function () { look(lastX, lastY); }, 1900); } wander(); }, 8000 + Math.random() * 7000);
   }
 
@@ -169,13 +172,13 @@
     var a; try { a = JSON.parse(localStorage.getItem("sirenSeen") || "[]"); } catch (e) { a = memSeen; }
     return (Array.isArray(a) ? a : []).filter(function (t) { return Date.now() - t < 3600000; });
   }
-  function allowed() { return seenLog().length < 2; }   // at most 2 appearances an hour
+  function allowed() { return seenLog().length < 6; }   // at most 6 appearances an hour (Helm 23 Nov 11:05 "more frequently"; was 2)
   function noteSeen() { var a = seenLog(); a.push(Date.now()); memSeen = a; try { localStorage.setItem("sirenSeen", JSON.stringify(a)); } catch (e) { /* private window: memory only */ } }
-  var present = Math.random() < .35 && allowed(), gone = false, clicks = 0;   // on about a third of the visits she is there from the start
-  var pages = 0, needPages = present ? 0 : 3 + Math.floor(Math.random() * 4), lastHref = location.href;   // otherwise after 3-6 page changes
+  var present = Math.random() < .7 && allowed(), gone = false, clicks = 0;   // on about a third of the visits she is there from the start
+  var pages = 0, needPages = present ? 0 : 1 + Math.floor(Math.random() * 2), lastHref = location.href;   // otherwise after 3-6 page changes
   function vanish() {   // after the second click: gone until the page moves, and then only with luck
     present = false; gone = true; clicks = 0; busy = false; bub.style.opacity = "0"; clearTimeout(wanderT); clearTimeout(timer);
-    pages = 0; needPages = 2 + Math.floor(Math.random() * 3);   // back after 2-4 page changes
+    pages = 0; needPages = 1 + Math.floor(Math.random() * 2);   // back after 1-2 page changes
     if (mode === "behind") { duck(function () { if (wrap && wrap.parentNode) wrap.parentNode.removeChild(wrap); }); }
     else { el.style.opacity = "0"; el.style.pointerEvents = "none"; }
   }
@@ -183,12 +186,13 @@
     present = true;
     if (mode === "behind") { if (visible) popBehind(); return; }
     var W = window.innerWidth, H = window.innerHeight;
-    el.style.transition = "none"; el.style.left = Math.round(W * (.2 + Math.random() * .6)) + "px"; el.style.top = (H + 20) + "px"; void el.offsetWidth; el.style.transition = "";
+    el.style.transition = "none"; el.style.left = STILL ? (W - 72) + "px" : Math.round(W * (.2 + Math.random() * .6)) + "px"; el.style.top = STILL ? (H - 48) + "px" : (H + 20) + "px"; void el.offsetWidth; el.style.transition = "";
+    if (STILL) el.classList.add("siren-still");
     el.style.opacity = ".97"; el.style.pointerEvents = "auto";
     setTimeout(function () { placeCorner(); setTimeout(function () { look(lastX, lastY); }, 1900); }, 60); wander();
   }
   function pageChanged() {   // a new page (the Lighthouse's Today, Journal, Crew ... or any link): she counts them while she is away
-    if (present) { if (mode === "corner" && !busy) placeCorner(); return; }
+    if (present) { if (mode === "corner" && !busy && !STILL) placeCorner(); return; }
     if (++pages >= needPages) { if (!allowed()) return; pages = 0; gone = false; noteSeen(); appear(); }
   }
   var screenN = 0;
