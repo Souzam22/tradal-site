@@ -24,7 +24,7 @@
     "Still staring at charts all day? Cute.", "Sorry, the crew works for one client. It isn't you.", "Waitlist? There's no waitlist. Just envy.",
     "Your stop-loss called. It misses you.", "Imagine having to place your own orders.", "How can someone stay so long in front of a screen?",
     "If you need to talk to someone, leave a message. They're enjoying life."];
-  var CONTACT = ["If you need to talk to someone, leave a message. They're enjoying life.", "Message them? They're busy. Trading. Without you.",
+  var CONTACT = ["If you need to talk to someone, leave a message. They're enjoying life.", "Message them? They're busy backtesting. You should do the same.",
     "Connect? Cute. They don't network. They backtest.", "Contact info? You're looking at it. Pink, round, unimpressed."];
   var SCREEN = ["How can someone stay so long in front of a screen?", "Still here? Blink. Stretch. Then back to work.",
     "That's a long time to stare at a screen. Even for me."];
