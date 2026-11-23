@@ -17,19 +17,22 @@
      habits and herself, never on a visitor's looks, money or brains. Public pages (tradal.co) get the set aimed at the crew and herself;
      the Lighthouse sets window.__sirenPrivate = true and gets the full set, the lines aimed at "you" included. No invented numbers. */
   var PRIV = !!window.__sirenPrivate;
+  var VISITOR = ["Yep. Sorry. We're not open for business.", "You wish you could trade with us.",
+    "'It would be so easy if I had TRADAL helping me.' I know. I hear it a lot.", "Don't tell me you're still losing money.",
+    "When are you joining the 5% that actually make money?", "Good luck today. You'll need it. The market is crazy.",
+    "Really? You still trade manually?", "Clicking buy and sell by hand? Brave. Very brave.", "We'd let you in, but the bots are picky.",
+    "Still staring at charts all day? Cute.", "Sorry, the crew works for one client. It isn't you.", "Waitlist? There's no waitlist. Just envy.",
+    "Your stop-loss called. It misses you."];
   var L = {
     hover: PRIV ? ["No profile, no invite. I still see more than your dashboard.", "Aww, you found me. Took you longer than the last bug.",
         "Smile. Somewhere a backtest is lying to you.", "Cute, right? So was your last 'quick fix'.", "I'm not on the team page. I'm the reason it's accurate."]
-      : ["No profile, no invite. Still here.", "I'm not on the team page. I'm the reason it's accurate.", "Aww, you found me. The crew never does.",
-        "Don't wave. I'm undercover.", "I'd sugarcoat it, but I'm already pink enough."],
+      : VISITOR.concat(["No profile, no invite. Still here.", "Don't wave. I'm undercover."]),
     click: PRIV ? ["Thanks for the click. The to-do list sends its regards.", "'Tested'? Once, on a Tuesday, with feeling.",
         "Every strategy is genius until Monday's open.", "Optimism is lovely. Stop-losses are lovelier.",
         "I don't break things. I just point at what's already broken.", "I'd sugarcoat it, but I'm already pink enough."]
-      : ["I don't break things. I just point at what's already broken.", "Every strategy is genius until Monday's open.",
-        "Optimism is lovely. Stop-losses are lovelier.", "Tested to fail? I'm the one who checks they did.",
-        "Sirens sing you onto the rocks. I point at them. You're welcome."],
-    behind: ["Group photo. Everyone smiling. Nobody checked the timestamps.", "Five AI agents and a captain. Somebody has to supervise the adults.",
-      "They have job titles. I have receipts.", "Lovely team. Very confident. Adorable, really.", "I'm not in the photo. I'm behind it."],
+      : VISITOR.concat(["Every strategy is genius until Monday's open.", "Optimism is lovely. Stop-losses are lovelier."]),
+    behind: (PRIV ? [] : VISITOR).concat(["Five AI agents and a captain. Somebody has to supervise the adults.",
+      "They have job titles. I have receipts.", "I'm not in the photo. I'm behind it."]),
     profile: ["Nice profile. I don't need one. Everyone already knows I'm watching.", "Introductions are for people who can be found.",
       "Profiles are cute. Mine is classified.", "Endorsements by the crew, about the crew. Adorable.", "I skipped the profile. Mystery photographs better.",
       "Don't introduce me. It ruins the effect.", "They get a bio. I get the backstage pass.", "No endorsements needed. My notes speak for themselves."]
@@ -45,6 +48,8 @@
     try {
       var t = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })), d = t.getDay(), h = t.getHours();
       if (h < 5 && d !== 6) return PRIV ? "Still up? The market isn't the only thing that's overextended." : "Past midnight. Even spies sleep. Not me, though.";
+      var m = t.getMinutes();
+      if (d >= 1 && d <= 5 && (h > 9 || (h === 9 && m >= 30)) && h < 16) return "Good luck today. You'll need it. The market is crazy.";
       if (d === 1 && h < 12) return "Monday. Fresh week, same mistakes. I'll be watching.";
       if ((d === 5 && h >= 17) || d === 6 || (d === 0 && h < 18)) return "Weekend! The bugs stay. I'll babysit.";
       if (d === 0 && h >= 18) return "Market's open. So are my eyes. Mostly my left one.";
@@ -175,7 +180,7 @@
       var tick = false;
       window.addEventListener("scroll", function () { if (!tick) { tick = true; setTimeout(function () { tick = false; check(); }, 150); } }, { passive: true });
       window.addEventListener("resize", function () { if (visible && !busy) duck(popBehind); });
-      setTimeout(check, 300);
+      setTimeout(check, 300); setInterval(check, 1500);   // backup: some views never fire scroll events
     } else {
       el.style.left = Math.round(window.innerWidth * .5) + "px"; el.style.top = "-80px"; cur = { a: 0 };   // she drips in from the top
       document.body.appendChild(el);
