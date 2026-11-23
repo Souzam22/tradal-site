@@ -138,9 +138,9 @@
 
   /* ---------- BEHIND mode: from behind the team heading's letters or a team card ---------- */
   function setT(y) { el.style.transform = "translateY(" + y + "px) rotate(" + cur.a + "deg)"; }
-  function duck(then) { if (!cur) { if (then) then(); return; } setT(8); setTimeout(function () { if (then) then(); }, 520); }
+  function duck(then) { if (!cur || greeting) { if (then) then(); return; } setT(8); setTimeout(function () { if (then) then(); }, 520); }
   function popBehind(forced) {
-    if (!visible) return;
+    if (!visible || greeting) return;
     var choices = hosts.filter(function (h) { return h !== lastHost && h.getBoundingClientRect().width > 80; });
     if (!choices.length) choices = hosts;
     var h = forced || pick(choices); lastHost = h; host = h;
@@ -172,7 +172,8 @@
     var a; try { a = JSON.parse(localStorage.getItem("sirenSeen") || "[]"); } catch (e) { a = memSeen; }
     return (Array.isArray(a) ? a : []).filter(function (t) { return Date.now() - t < 3600000; });
   }
-  function allowed() { return seenLog().length < 6; }   // at most 6 appearances an hour (Helm 23 Nov 11:05 "more frequently"; was 2)
+  var maxHour = 6, firstVisit = false, greeting = false;
+  function allowed() { return seenLog().length < maxHour; }   // at most 6 appearances an hour (Helm 23 Nov 11:05 "more frequently"; was 2)
   function noteSeen() { var a = seenLog(); a.push(Date.now()); memSeen = a; try { localStorage.setItem("sirenSeen", JSON.stringify(a)); } catch (e) { /* private window: memory only */ } }
   var present = Math.random() < .7 && allowed(), gone = false, clicks = 0;   // on about a third of the visits she is there from the start
   var pages = 0, needPages = present ? 0 : 1 + Math.floor(Math.random() * 2), lastHref = location.href;   // otherwise after 3-6 page changes
@@ -191,6 +192,27 @@
     el.style.opacity = ".97"; el.style.pointerEvents = "auto";
     setTimeout(function () { placeCorner(); setTimeout(function () { look(lastX, lastY); }, 1900); }, 60); wander();
   }
+  function greet() {   // first visit on tradal.co: bottom-right corner, still, about 20 s (longer while someone hovers or clicks her)
+    if (gone || busy || (present && visible)) return;
+    greeting = true; mode = "corner"; cur = { a: 0 };
+    if (wrap && wrap.parentNode) wrap.parentNode.removeChild(wrap);
+    var W = window.innerWidth, H = window.innerHeight;
+    el.style.transition = "none"; el.style.opacity = "0"; el.style.left = (W - 72) + "px"; el.style.top = (H - 48) + "px";
+    el.classList.add("siren-still"); document.body.appendChild(el); void el.offsetWidth; el.style.transition = "";
+    el.style.opacity = ".97"; el.style.pointerEvents = "auto";
+    setTimeout(function () { placeCorner(); look(lastX, lastY); }, 60);
+    var end = function () {
+      if (busy || hovering) { setTimeout(end, 3000); return; }
+      el.style.opacity = "0"; el.style.pointerEvents = "none"; bub.style.opacity = "0";
+      setTimeout(function () {
+        if (el.parentNode === document.body) document.body.removeChild(el);
+        el.classList.remove("siren-still"); el.style.left = el.style.top = el.style.transform = el.style.opacity = el.style.pointerEvents = "";
+        mode = "behind"; greeting = false;
+        if (present && visible) popBehind();
+      }, 700);
+    };
+    setTimeout(end, 20000);
+  }
   function pageChanged() {   // a new page (the Lighthouse's Today, Journal, Crew ... or any link): she counts them while she is away
     if (present) { if (mode === "corner" && !busy && !STILL) placeCorner(); return; }
     if (++pages >= needPages) { if (!allowed()) return; pages = 0; gone = false; noteSeen(); appear(); }
@@ -208,8 +230,16 @@
     el = document.createElement("button"); el.type = "button"; el.className = "siren-peek"; el.setAttribute("aria-label", "Siren is watching"); el.title = "Siren";
     el.innerHTML = SVG; eye = el.querySelector(".siren-eyes");
     bub = document.createElement("div"); bub.className = "siren-bubble"; bub.setAttribute("role", "status"); document.body.appendChild(bub);
-    if (present) noteSeen();
     var head = document.querySelector("[data-siren-behind]");
+    if (head) {
+      // tradal.co (Helm 23 Nov 16:55 "appear in the first 15 sec on the web, then more sporadic"): on a visitor's first visit she peeks
+      // from the bottom-right corner 4-10 s in, whatever part of the page is on screen, for about 20 s; after that she is rare:
+      // behind the team on about a quarter of the visits, at most 3 appearances an hour.
+      try { firstVisit = !localStorage.getItem("sirenMet"); localStorage.setItem("sirenMet", "1"); } catch (e) { firstVisit = true; }
+      maxHour = 3; present = !firstVisit && Math.random() < .25 && allowed();
+      if (firstVisit) { noteSeen(); setTimeout(greet, 4000 + Math.random() * 6000); }
+    }
+    if (present) noteSeen();
     if (head) {
       mode = "behind";
       var sel = head.getAttribute("data-siren-behind"); hosts = [head];
