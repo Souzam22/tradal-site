@@ -69,19 +69,16 @@
     var a = L[kind].filter(function (x) { return x !== lastLine; }); lastLine = pick(a.length ? a : L[kind]); return lastLine;
   }
   var lastLine = null;
-  function spots() {   // tip to the edge: top = hanging like a drip, sides and bottom tip-out, corners diagonal
+  function spots() {   // always upright, never upside down (Helm 23 Nov): peeking over the bottom edge, from the bottom corners or from the sides
     var W = window.innerWidth, H = window.innerHeight;
-    return [{ k: "tl", x: -16, y: -16, a: -45, h: "left", v: "top" }, { k: "tr", x: W - 50, y: -16, a: 45, h: "right", v: "top" },
-      { k: "bl", x: -16, y: H - 50, a: -135, h: "left", v: "bottom" }, { k: "br", x: W - 50, y: H - 50, a: 135, h: "right", v: "bottom" },
-      { k: "t1", x: Math.round(W * .22), y: -24, a: 0, h: "left", v: "top" }, { k: "t2", x: Math.round(W * .64), y: -24, a: 0, h: "right", v: "top" },
-      { k: "l1", x: -24, y: Math.round(H * .45), a: -90, h: "left", v: "mid" }, { k: "r1", x: W - 42, y: Math.round(H * .38), a: 90, h: "right", v: "mid" },
-      { k: "b1", x: Math.round(W * .42), y: H - 42, a: 180, h: "left", v: "bottom" }];
+    return [{ k: "bl", x: 6, y: H - 48, a: 0, ox: 0, oy: -10, h: "left", v: "bottom" }, { k: "br", x: W - 72, y: H - 48, a: 0, ox: 0, oy: -10, h: "right", v: "bottom" },
+      { k: "b1", x: Math.round(W * .3), y: H - 44, a: 0, ox: 0, oy: -10, h: "left", v: "bottom" }, { k: "b2", x: Math.round(W * .62), y: H - 44, a: 0, ox: 0, oy: -10, h: "right", v: "bottom" },
+      { k: "l1", x: -26, y: Math.round(H * .5), a: 0, ox: 12, oy: 0, h: "left", v: "mid" }, { k: "r1", x: W - 40, y: Math.round(H * .42), a: 0, ox: -12, oy: 0, h: "right", v: "mid" }];
   }
   var css = ".siren-peek{position:fixed;z-index:2147483000;width:66px;height:66px;padding:0;border:0;background:none;cursor:pointer;pointer-events:auto;transition:transform .55s cubic-bezier(.3,1.4,.5,1),opacity .35s,left 1.8s cubic-bezier(.45,0,.2,1),top 1.8s cubic-bezier(.45,0,.2,1);opacity:.97}"
     + ".siren-peek svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 2px 4px rgba(7,42,77,.28))}"
-    + ".siren-peek svg{animation:sirenBounce 1.9s cubic-bezier(.5,0,.5,1) infinite;transform-origin:50% 90%}"
-    + "@keyframes sirenBounce{0%,100%{transform:translateY(0) scale(1.07,.93)}12%{transform:translateY(0) scale(1,1)}"
-    + "45%{transform:translateY(-8px) scale(.95,1.06)}55%{transform:translateY(-8px) scale(.96,1.05)}88%{transform:translateY(0) scale(1,1)}}"
+    + ".siren-peek svg{animation:sirenBounce 2.8s ease-in-out infinite;transform-origin:50% 90%}"
+    + "@keyframes sirenBounce{0%,100%{transform:translateY(0) scale(1.015,.985)}50%{transform:translateY(-2.5px) scale(.995,1.005)}}"
     + ".siren-peek .siren-eyes{transition:transform .22s ease-out}"
     + ".siren-peek .siren-blink{transform-box:fill-box;transform-origin:center;animation:sirenBlink 5.2s infinite}"
     + "@keyframes sirenBlink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.12)}}"
@@ -100,9 +97,9 @@
     var b = el.getBoundingClientRect(), dx = x - (b.left + b.width / 2), dy = y - (b.top + b.height / 2);
     var r = -cur.a * Math.PI / 180, lx = dx * Math.cos(r) - dy * Math.sin(r), ly = dx * Math.sin(r) + dy * Math.cos(r);
     var d = Math.sqrt(lx * lx + ly * ly) || 1, k = Math.min(1, d / 160);
-    eye.setAttribute("transform", "translate(" + (-8 + 9 * k * lx / d).toFixed(1) + " " + (2 + 5 * k * ly / d).toFixed(1) + ")");
+    eye.setAttribute("transform", "translate(" + (-6 + 12 * k * lx / d).toFixed(1) + " " + (2 + 9 * k * ly / d).toFixed(1) + ")");   // any direction, 360
   }
-  var EYE_SCAN = [[-16, 2], [2, 2], [-8, -4], [-8, 8], [-15, -3], [1, 7], [-8, 2]], scanI = 0, scanT = null, idleT = null;
+  var EYE_SCAN = [[6, 2], [-18, 2], [-6, -7], [-6, 11], [2.5, -4.4], [-14.5, 8.4], [-14.5, -4.4], [2.5, 8.4], [-6, 2]], scanI = 0, scanT = null, idleT = null;
   function scan() {   // pointer still for a while: her eyes wander, left, right, up, down
     clearTimeout(scanT); if (!eye) return;
     var p = EYE_SCAN[scanI++ % EYE_SCAN.length]; eye.setAttribute("transform", "translate(" + p[0] + " " + p[1] + ")");
@@ -129,7 +126,7 @@
   function placeCorner() {
     var c = pick(spots().filter(function (x) { return x.k !== last; })), s = el.style;
     last = c.k; cur = c; s.right = s.bottom = ""; s.left = c.x + "px"; s.top = c.y + "px";
-    el.dataset.rest = "rotate(" + c.a + "deg)"; el.dataset.out = "rotate(" + c.a + "deg) translateY(12px)"; el.style.transform = el.dataset.rest;
+    el.dataset.rest = "translate(0px,0px)"; el.dataset.out = "translate(" + c.ox + "px," + c.oy + "px)"; el.style.transform = el.dataset.rest;
   }
   function wander() {
     clearTimeout(wanderT);
@@ -146,7 +143,7 @@
     var h = forced || pick(choices); lastHost = h; host = h;
     if (wrap && wrap.parentNode) wrap.parentNode.removeChild(wrap);
     wrap = document.createElement("span"); wrap.className = "siren-wrap";
-    var tilt = (Math.random() < .5 ? -1 : 1) * (6 + Math.random() * 14); cur = { a: tilt };
+    cur = { a: 0 };   // upright behind the team too
     if (h.hasAttribute("data-siren-behind")) {
       // behind the letters: the wrap lives inside the heading, under its text (z-index -1 in an isolated heading)
       if (getComputedStyle(h).position === "static") h.style.position = "relative";
@@ -167,10 +164,37 @@
     clearTimeout(timer); timer = setTimeout(function () { if (!busy) duck(popBehind); }, 14000 + Math.random() * 12000);
   }
 
+  var memSeen = [];
+  function seenLog() {   // her appearances in the last hour, kept in this browser (a reload does not reset it)
+    var a; try { a = JSON.parse(localStorage.getItem("sirenSeen") || "[]"); } catch (e) { a = memSeen; }
+    return (Array.isArray(a) ? a : []).filter(function (t) { return Date.now() - t < 3600000; });
+  }
+  function allowed() { return seenLog().length < 2; }   // at most 2 appearances an hour
+  function noteSeen() { var a = seenLog(); a.push(Date.now()); memSeen = a; try { localStorage.setItem("sirenSeen", JSON.stringify(a)); } catch (e) { /* private window: memory only */ } }
+  var present = Math.random() < .35 && allowed(), gone = false, clicks = 0;   // on about a third of the visits she is there from the start
+  var pages = 0, needPages = present ? 0 : 3 + Math.floor(Math.random() * 4), lastHref = location.href;   // otherwise after 3-6 page changes
+  function vanish() {   // after the second click: gone until the page moves, and then only with luck
+    present = false; gone = true; clicks = 0; busy = false; bub.style.opacity = "0"; clearTimeout(wanderT); clearTimeout(timer);
+    pages = 0; needPages = 2 + Math.floor(Math.random() * 3);   // back after 2-4 page changes
+    if (mode === "behind") { duck(function () { if (wrap && wrap.parentNode) wrap.parentNode.removeChild(wrap); }); }
+    else { el.style.opacity = "0"; el.style.pointerEvents = "none"; }
+  }
+  function appear() {
+    present = true;
+    if (mode === "behind") { if (visible) popBehind(); return; }
+    var W = window.innerWidth, H = window.innerHeight;
+    el.style.transition = "none"; el.style.left = Math.round(W * (.2 + Math.random() * .6)) + "px"; el.style.top = (H + 20) + "px"; void el.offsetWidth; el.style.transition = "";
+    el.style.opacity = ".97"; el.style.pointerEvents = "auto";
+    setTimeout(function () { placeCorner(); setTimeout(function () { look(lastX, lastY); }, 1900); }, 60); wander();
+  }
+  function pageChanged() {   // a new page (the Lighthouse's Today, Journal, Crew ... or any link): she counts them while she is away
+    if (present) { if (mode === "corner" && !busy) placeCorner(); return; }
+    if (++pages >= needPages) { if (!allowed()) return; pages = 0; gone = false; noteSeen(); appear(); }
+  }
   var screenN = 0;
   function screenTime() {
     setTimeout(function () {
-      var on = el && el.isConnected && (mode === "corner" || visible);
+      var on = present && el && el.isConnected && (mode === "corner" || visible);
       if (on && !busy && !hovering) { say(SCREEN[screenN++ % SCREEN.length], false); setTimeout(function () { if (!busy && !hovering) bub.style.opacity = "0"; }, 5000); }
       screenTime();
     }, screenN === 0 ? 240000 : 720000);
@@ -180,6 +204,7 @@
     el = document.createElement("button"); el.type = "button"; el.className = "siren-peek"; el.setAttribute("aria-label", "Siren is watching"); el.title = "Siren";
     el.innerHTML = SVG; eye = el.querySelector(".siren-eyes");
     bub = document.createElement("div"); bub.className = "siren-bubble"; bub.setAttribute("role", "status"); document.body.appendChild(bub);
+    if (present) noteSeen();
     var head = document.querySelector("[data-siren-behind]");
     if (head) {
       mode = "behind";
@@ -189,7 +214,7 @@
       // in view = the heading row is on screen (checked on scroll; no IntersectionObserver, which some embedded views never fire)
       var check = function () {
         var r = section.getBoundingClientRect(), on = r.top < window.innerHeight - 120 && r.bottom > 120;
-        if (on && !visible) { visible = true; setTimeout(popBehind, 700); }
+        if (on && !visible) { visible = true; if (present) setTimeout(popBehind, 700); }
         else if (!on && visible) { visible = false; clearTimeout(timer); duck(); bub.style.opacity = "0"; }
       };
       var tick = false;
@@ -197,11 +222,13 @@
       window.addEventListener("resize", function () { if (visible && !busy) duck(popBehind); });
       setTimeout(check, 300); setInterval(check, 1500);   // backup: some views never fire scroll events
     } else {
-      el.style.left = Math.round(window.innerWidth * .5) + "px"; el.style.top = "-80px"; cur = { a: 0 };   // she drips in from the top
+      cur = { a: 0 }; el.style.opacity = "0"; el.style.pointerEvents = "none"; el.style.left = "50%"; el.style.top = (window.innerHeight + 20) + "px";
       document.body.appendChild(el);
-      setTimeout(function () { placeCorner(); setTimeout(function () { look(lastX, lastY); }, 1900); }, 400); wander();
-      window.addEventListener("resize", function () { if (!busy) placeCorner(); });
+      if (present) setTimeout(appear, 400);
+      window.addEventListener("resize", function () { if (!busy && present) placeCorner(); });
     }
+    // page changes: the address changes (hash pages on the Lighthouse); checked twice a second, no listeners needed
+    setInterval(function () { if (location.href !== lastHref) { lastHref = location.href; pageChanged(); } }, 500);
     document.addEventListener("pointermove", function (e) { lastX = e.clientX; lastY = e.clientY; look(e.clientX, e.clientY); stillSoon(); }, { passive: true });
     stillSoon(); screenTime();
     // Crew profiles (Helm 23 Nov: "on the Crew profile ... she does not need a profile or to be introduced"): when someone opens a crew
@@ -209,7 +236,7 @@
     // Lighthouse: window.__sirenProfiles (the Crew page cards and the LinkedT profile pop-up).
     var profSel = (head && head.getAttribute("data-siren-profiles")) || window.__sirenProfiles || "", lastReact = 0, hoverT = null, hoverEl = null;
     function react(card) {
-      if (busy || Date.now() - lastReact < 7000) return; lastReact = Date.now();
+      if (!present || busy || Date.now() - lastReact < 7000) return; lastReact = Date.now();
       var text = line("profile");
       if (mode === "behind" && visible && card && hosts.indexOf(card) >= 0) {
         clearTimeout(timer); duck(function () { popBehind(card); setTimeout(function () { say(text, false); setTimeout(function () { if (!busy) bub.style.opacity = "0"; }, 3800); }, 650); });
@@ -221,7 +248,7 @@
     }
     var contactSel = (head && head.getAttribute("data-siren-contact")) || window.__sirenContact || "", lastContact = 0, contactN = 0;
     function contactReact(t) {
-      if (busy || Date.now() - lastContact < 5000) return; lastContact = Date.now(); lastReact = Date.now();
+      if (!present || busy || Date.now() - lastContact < 5000) return; lastContact = Date.now(); lastReact = Date.now();
       var text = contactN++ ? line("contact") : CONTACT[0], card = profSel && t.closest ? t.closest(profSel) : null;
       if (mode === "behind" && visible && card && hosts.indexOf(card) >= 0 && card !== host) {
         clearTimeout(timer); duck(function () { popBehind(card); setTimeout(function () { say(text, false); setTimeout(function () { if (!busy) bub.style.opacity = "0"; }, 4500); }, 650); });
@@ -246,10 +273,10 @@
     // when someone types in the Lighthouse feed or crew notes (window.__sirenChat), she jumps to the edge of that box and heckles.
     var chatSel = window.__sirenChat || "", chatLast = 0, typeT = null;
     function chatReact(f) {
-      if (busy || mode !== "corner" || Date.now() - chatLast < 9000 || !el.isConnected) return; chatLast = Date.now();
+      if (!present || busy || mode !== "corner" || Date.now() - chatLast < 9000 || !el.isConnected) return; chatLast = Date.now();
       var r = f.getBoundingClientRect(), st = el.style, keep = { top: st.top, bottom: st.bottom, left: st.left, right: st.right, t: st.transform, c: cur };
       st.bottom = st.right = ""; st.top = Math.max(4, r.top - 46) + "px"; st.left = Math.max(4, Math.min(window.innerWidth - 74, r.right - 52)) + "px";
-      cur = { a: 16, h: r.right > window.innerWidth - 300 ? "right" : "left" }; st.transform = "rotate(16deg)";
+      cur = { a: 0, h: r.right > window.innerWidth - 300 ? "right" : "left" }; st.transform = "none";
       say(line("chat"), false);
       setTimeout(function () { if (busy) return; bub.style.opacity = "0"; st.top = keep.top; st.bottom = keep.bottom; st.left = keep.left; st.right = keep.right; st.transform = keep.t; cur = keep.c; }, 4500);
     }
@@ -278,8 +305,11 @@
       if (!busy) bub.style.opacity = "0";
     });
     el.addEventListener("click", function () {
+      clicks++;
+      if (clicks >= 2) { busy = true; say(pick(["Fine. I'm gone.", "Twice? Rude. Bye.", "Okay, okay. Vanishing."]), false); setTimeout(vanish, 1200); return; }
       busy = true; say(line("click"), true);
       setTimeout(function () {
+        if (!present) return;   // the second click came first: she is already gone
         busy = false; bub.style.opacity = "0";
         if (mode === "behind") { duck(function () { setTimeout(popBehind, 600 + Math.random() * 1500); }); return; }
         placeCorner(); wander(); setTimeout(function () { look(lastX, lastY); }, 1900);   // she slips off to another spot
