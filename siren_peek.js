@@ -22,14 +22,17 @@
     "When are you joining the 5% that actually make money?", "Good luck today. You'll need it. The market is crazy.",
     "Really? You still trade manually?", "Clicking buy and sell by hand? Brave. Very brave.", "We'd let you in, but the bots are picky.",
     "Still staring at charts all day? Cute.", "Sorry, the crew works for one client. It isn't you.", "Waitlist? There's no waitlist. Just envy.",
-    "Your stop-loss called. It misses you.", "Imagine having to place your own orders."];
+    "Your stop-loss called. It misses you.", "Imagine having to place your own orders.", "How can someone stay so long in front of a screen?"];
+  var SCREEN = ["How can someone stay so long in front of a screen?", "Still here? Blink. Stretch. Then back to work.",
+    "That's a long time to stare at a screen. Even for me."];
   var L = {
     hover: PRIV ? ["No profile, no invite. I still see more than your dashboard.", "Aww, you found me. Took you longer than the last bug.",
         "Smile. Somewhere a backtest is lying to you.", "Cute, right? So was your last 'quick fix'.", "I'm not on the team page. I'm the reason it's accurate."]
       : VISITOR.concat(["No profile, no invite. Still here.", "Don't wave. I'm undercover."]),
     click: PRIV ? ["Thanks for the click. The to-do list sends its regards.", "'Tested'? Once, on a Tuesday, with feeling.",
         "Every strategy is genius until Monday's open.", "Optimism is lovely. Stop-losses are lovelier.",
-        "I don't break things. I just point at what's already broken.", "I'd sugarcoat it, but I'm already pink enough."]
+        "I don't break things. I just point at what's already broken.", "I'd sugarcoat it, but I'm already pink enough.",
+        "How can someone stay so long in front of a screen?"]
       : VISITOR.concat(["Every strategy is genius until Monday's open.", "Optimism is lovely. Stop-losses are lovelier."]),
     behind: (PRIV ? [] : VISITOR).concat(["Five AI agents and a captain. Somebody has to supervise the adults.",
       "They have job titles. I have receipts.", "I'm not in the photo. I'm behind it."]),
@@ -160,6 +163,14 @@
     clearTimeout(timer); timer = setTimeout(function () { if (!busy) duck(popBehind); }, 14000 + Math.random() * 12000);
   }
 
+  var screenN = 0;
+  function screenTime() {
+    setTimeout(function () {
+      var on = el && el.isConnected && (mode === "corner" || visible);
+      if (on && !busy && !hovering) { say(SCREEN[screenN++ % SCREEN.length], false); setTimeout(function () { if (!busy && !hovering) bub.style.opacity = "0"; }, 5000); }
+      screenTime();
+    }, screenN === 0 ? 240000 : 720000);
+  }
   function start() {
     var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
     el = document.createElement("button"); el.type = "button"; el.className = "siren-peek"; el.setAttribute("aria-label", "Siren is watching"); el.title = "Siren";
@@ -188,7 +199,7 @@
       window.addEventListener("resize", function () { if (!busy) placeCorner(); });
     }
     document.addEventListener("pointermove", function (e) { lastX = e.clientX; lastY = e.clientY; look(e.clientX, e.clientY); stillSoon(); }, { passive: true });
-    stillSoon();
+    stillSoon(); screenTime();
     // Crew profiles (Helm 23 Nov: "on the Crew profile ... she does not need a profile or to be introduced"): when someone opens a crew
     // member's profile, she turns up and makes a joke about not needing one. tradal.co: data-siren-profiles on the heading (the team cards);
     // Lighthouse: window.__sirenProfiles (the Crew page cards and the LinkedT profile pop-up).
