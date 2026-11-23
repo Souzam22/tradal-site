@@ -10,7 +10,7 @@
    Her eye follows the pointer in both. Hover her three times and she gives up the act. Self-contained: no libraries, no data, no network. */
 (function () {
   if (window.__sirenPeek) return; window.__sirenPeek = true;
-  var SVG = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><defs><filter id='sirenGlow' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='1.6' result='b'/><feMerge><feMergeNode in='b'/><feMergeNode in='SourceGraphic'/></feMerge></filter></defs> <path d='M64 80 C74 80 80 74 80 66' fill='none' stroke='#9e1f5d' stroke-width='5' stroke-linecap='round'/> <path d='M80 67 C75 62 72 57 74 52 C78 55 80 59 80.5 63 C81 59 83 55 87.5 53.5 C88 58 85 63 80 67 Z' fill='#0b0d12'/> <circle cx='46' cy='50' r='32' fill='#d63384'/> <circle cx='46' cy='50' r='32' fill='none' stroke='#9e1f5d' stroke-width='2'/> <ellipse cx='36' cy='34' rx='10' ry='5' fill='#fff' opacity='0.35' transform='rotate(-25 36 34)'/> <rect x='28' y='46' width='36' height='9' rx='4.5' fill='#0b0d12'/> <rect class='siren-eye' x='40' y='47.5' width='12' height='6' rx='3' fill='#ffffff' filter='url(#sirenGlow)'/> <path class='siren-brow' d='M50 41 q6 -3.6 12 -1.2' fill='none' stroke='#0b0d12' stroke-width='2' stroke-linecap='round'/> <path d='M40 64 q5 2.4 10 -1.4' fill='none' stroke='#0b0d12' stroke-width='1.8' stroke-linecap='round' opacity='.9'/></svg>";
+  var SVG = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><defs><filter id='sirenGlow' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='1.6' result='b'/><feMerge><feMergeNode in='b'/><feMergeNode in='SourceGraphic'/></feMerge></filter></defs> <path d='M64 80 C74 80 80 74 80 66' fill='none' stroke='#be185d' stroke-width='5' stroke-linecap='round'/> <path d='M80 67 C75 62 72 57 74 52 C78 55 80 59 80.5 63 C81 59 83 55 87.5 53.5 C88 58 85 63 80 67 Z' fill='#0b0d12'/> <circle cx='46' cy='50' r='32' fill='#ec4899'/> <circle cx='46' cy='50' r='32' fill='none' stroke='#be185d' stroke-width='2'/> <ellipse cx='36' cy='34' rx='10' ry='5' fill='#fff' opacity='0.35' transform='rotate(-25 36 34)'/> <rect x='28' y='46' width='36' height='9' rx='4.5' fill='#0b0d12'/> <rect class='siren-eye' x='40' y='47.5' width='12' height='6' rx='3' fill='#ffffff' filter='url(#sirenGlow)'/> <path class='siren-brow' d='M50 41 q6 -3.6 12 -1.2' fill='none' stroke='#0b0d12' stroke-width='2' stroke-linecap='round'/> <path d='M40 64 q5 2.4 10 -1.4' fill='none' stroke='#0b0d12' stroke-width='1.8' stroke-linecap='round' opacity='.9'/></svg>";
   /* Her voice (Helm 23 Nov): "cute but not", "a very acid sense of humor". Soft face, sharp tongue: the acid lands on the work, the crew's
      habits and herself, never on a visitor's looks, money or brains. Public pages (tradal.co) get the set aimed at the crew and herself;
      the Lighthouse sets window.__sirenPrivate = true and gets the full set, the lines aimed at "you" included. No invented numbers. */
@@ -82,6 +82,11 @@
     var right = mode === "corner" ? cur && cur.h === "right" : b.left > window.innerWidth / 2, top = mode === "corner" && cur && cur.v === "top";
     var x = right ? b.left - 252 : b.right + 10, y = top ? b.bottom - 6 : b.top + (mode === "corner" ? 6 : -8);
     bub.style.left = Math.min(Math.max(8, x), window.innerWidth - 256) + "px"; bub.style.top = Math.min(Math.max(8, y), window.innerHeight - 60) + "px"; bub.style.opacity = "1";
+  }
+  function hit(e, sel) {   // the element matching sel on the event's path, through shadow roots (the Lighthouse draws inside one)
+    var p = e.composedPath ? e.composedPath() : [e.target];
+    for (var i = 0; i < p.length; i++) { var n = p[i]; if (n && n.nodeType === 1 && n.matches && n.matches(sel)) return n; }
+    return null;
   }
   function hoverLine() { hovers++; return hovers === 3 ? pick(L.caught) : line(mode === "behind" ? "behind" : "hover"); }
 
@@ -167,11 +172,11 @@
     }
     if (profSel) {
       document.addEventListener("mouseover", function (e) {
-        var c = e.target && e.target.closest ? e.target.closest(profSel) : null;
+        var c = hit(e, profSel);
         if (c === hoverEl) return; hoverEl = c; clearTimeout(hoverT);
         if (c) hoverT = setTimeout(function () { if (hoverEl === c) react(c); }, 650);
       }, { passive: true });
-      document.addEventListener("focusin", function (e) { var c = e.target && e.target.closest ? e.target.closest(profSel) : null; if (c) react(c); });
+      document.addEventListener("focusin", function (e) { var c = hit(e, profSel); if (c) react(c); });
     }
     // The crew chat (Helm 23 Nov: "close to the chat, make jokes of why do you talk that much, go back to work. Really nobody cares"):
     // when someone types in the Lighthouse feed or crew notes (window.__sirenChat), she jumps to the edge of that box and heckles.
@@ -186,7 +191,7 @@
     }
     if (chatSel) {
       document.addEventListener("input", function (e) {
-        var f = e.target && e.target.matches && e.target.matches(chatSel) ? e.target : null; if (!f) return;
+        var f = hit(e, chatSel); if (!f) return;
         clearTimeout(typeT); typeT = setTimeout(function () { chatReact(f); }, 1300);
       });
     }
